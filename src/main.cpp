@@ -181,7 +181,7 @@ private:
     // Varaible related to topology
     const gmx_mtop_t                 *mtop_;
     const gmx_localtop_t             *localtop_;
-    const t_atoms                    *atoms_;
+    AtomsDataPtr                      atoms_;
 
     //Variable for index file
     int *isize_, foc_isize;
@@ -348,7 +348,8 @@ void AnalysisTemplate::optionsFinished(TrajectoryAnalysisSettings *)
         GMX_THROW(InconsistentInputError("Input parameter file for the PBSA calculation is missing, use \"-i\" option\n"));
     }
 
-    if(bPBSA_) readPBSAInputs();
+    if(bPBSA_)
+        readPBSAInputs();
 }
 
 
@@ -366,7 +367,7 @@ AnalysisTemplate::initAnalysis(const TrajectoryAnalysisSettings &settings,
 
     mtop_ = topInfo.mtop();
     localtop_ = topInfo.expandedTopology();
-    atoms_ = topInfo.atoms();
+    atoms_ = topInfo.copyAtoms();
 
     // Building complex atom indices
     if (bDIFF_) {
@@ -428,6 +429,10 @@ AnalysisTemplate::initAnalysis(const TrajectoryAnalysisSettings &settings,
     prepareOutputFiles(&settings);
 
     if (bIncl14_) buildNonBondedPairList();
+    
+    if(bPBSA_) {
+        assignRadius();
+    }
 }
 
 
@@ -926,16 +931,17 @@ void AnalysisTemplate::readPBSAInputs()
 
 void AnalysisTemplate::assignRadius()
 {
+
     std::map<std::string, real> radiusDef = {
-        {"o", 1.520 },
-        {"s", 1.830 },
-        {"n", 1.550 },
-        {"c", 1.700 },
-        {"h", 1.2   },
-        {"p", 1.8 },
-        {"f", 1.470},
-        {"i", 2.060},
-        {"cl", 1.770},
+        {"o",  1.520},
+        {"s",  1.830},
+        {"n",  1.550},
+        {"c",  1.700},
+        {"h",  1.200},
+        {"p",  1.800},
+        {"f",  1.470},
+        {"i",  2.060},
+        {"cl", 1.770}, // Chlorine atomtype
         {"br", 1.920},
         {"ca", 1.770},
         {"cb", 1.770},
@@ -949,46 +955,72 @@ void AnalysisTemplate::assignRadius()
         {"ha", 1.000},
         {"h4", 1.000},
         {"h5", 1.000},
+        {"c0", 2.310}, // Calcium atomtype
         {"mw", 0.050}, // virtual-sites pr sigma-holes
     };
     
-    int itype, ntype = mtop_->ffparams.atnr;
+    int isize;
+    const int *index;
+    if (bDIFF_) {
+        isize = isize_[2];
+        index = index_[2];
+    } else {
+        isize = isize_[0];
+        index = index_[0];
+    }
+    
+    if (atoms_->pdbinfo == nullptr) {
+        snew(atoms_->pdbinfo, atoms_->nr);
+    } else {
+        srenew(atoms_->pdbinfo, atoms_->nr);
+    }
+        
+    
+    int itype, ntype = mtop_->atomtypes.nr;
     real c6, c12, sig6, rad = -1;
-    std::string atomtype, atomname, atomtype2;
-    for (int i = 0; i < atoms_->nr; i++) {      // get charge and radius for all atoms
+    std::string atomtype, atomname, atomname2, atomtype2;
+    for (int i = 0; i < isize; i++) {      // get charge and radius for all atoms
         rad = -1;
         
         // calculate radius from force-field parameters
         // if radius is not found later on, force-field radius will be used
-        itype = atoms_->atom[i].type;
+        itype = atoms_->atom[index[i]].type;
         c12 = localtop_->idef.iparams[itype * ntype + itype].lj.c12;
         c6 =  localtop_->idef.iparams[itype * ntype + itype].lj.c6;
         if ((c6 != 0) && (c12 != 0)) {
           sig6 = c12 / c6;
           rad = 0.5 * pow(sig6, 1.0 / 6.0);
+        } else {
+            rad = rvdw_;
         }
+        
         rad *= 10; //Conversion of nano meter to angstroms
         
-        
         // Try to find radius based on atomname and atomtype
-        atomtype = *(atoms_->atomtype[i]);
+        atomtype = *(atoms_->atomtype[index[i]]);
         std::transform(atomtype.begin(), atomtype.end(), atomtype.begin(), [](unsigned char c){ return std::tolower(c); });
-        atomname = *(atoms_->atomname[i]);
+        
+        atomname = *(atoms_->atomname[index[i]]);
         std::transform(atomname.begin(), atomname.end(), atomname.begin(), [](unsigned char c){ return std::tolower(c); });
         
-        if (radiusDef.count(atomname) > 0) // first based on atomname - mostly single charecter atomname
+        // First assign on the basis of element, i.e. first charecter of atomname
+        atomname2 = atomname.at(0);
+        if (radiusDef.count(atomname2) > 0)
+            rad = radiusDef[atomname2];
+        
+        if (radiusDef.count(atomname) > 0) // reassign based on atomname - mostly two charecters atomname
             rad = radiusDef[atomname];
-        else if (radiusDef.count(atomtype) > 0) // second based on atomtype - two charecters name
+        else if (radiusDef.count(atomtype) > 0) // reassign based on atomtype
             rad = radiusDef[atomtype];
         else
-            if (atomtype.length() > 1) // check whether first two charecters of atomtype matches
+            if (atomtype.length() > 1) // reassign based on first two charecters of atomtype matche
                 atomtype2 = atomtype[0]+atomtype[1];
                 if (radiusDef.count(atomtype2) > 0)
                     rad = radiusDef[atomtype];
       
         // Assigned charge and radius to ocuppancy and bfactor field
-        atoms_->pdbinfo[i].occup = atoms_->atom[i].q;
-        atoms_->pdbinfo[i].bfac = rad;
+        atoms_->pdbinfo[index[i]].occup = atoms_->atom[index[i]].q;
+        atoms_->pdbinfo[index[i]].bfac = rad;
     }
     
     // First index group
