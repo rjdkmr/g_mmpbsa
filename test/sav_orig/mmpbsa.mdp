@@ -1,74 +1,8 @@
 ;Polar calculation: "yes" or "no"
 polar		= no
 
-;=============
-;PSIZE options
-;=============
-;Factor by which to expand molecular dimensions to get coarsegrid dimensions.
-cfac 		= 1.5
-
-;The desired fine mesh spacing (in A)
-gridspace 	= 0.5
-
-:Amount (in A) to add to molecular dimensions to get fine grid dimensions.
-fadd 		= 5
-
-;Maximum memory (in MB) available per-processor for a calculation.
-gmemceil 	= 4000
-
-;=============================================
-;APBS kwywords for polar solvation calculation
-;=============================================
-;Charge of positive ions
-pcharge 	= 1
-
-;Radius of positive charged ions
-prad		= 0.95
-
-;Concentration of positive charged ions
-pconc           = 0.150 
-
-;Charge of negative ions
-ncharge 	= -1
-
-;Radius of negative charged ions
-nrad		= 1.81
-
-;Concentration of negative charged ions
-nconc 		= 0.150
-
-;Solute dielectric constant
-pdie 		= 2
-
-;Solvent dielectric constant
-sdie 		= 80
-
-;Reference or vacuum dielectric constant
-vdie 		= 1
-
 ;Solvent probe radius
 srad 		= 1.4
-
-;Method used to map biomolecular charges on grid. chgm = spl0 or spl2 or spl4
-chgm            = spl4
-
-;Model used to construct dielectric and ionic boundary. srfm = smol or spl2 or spl4
-srfm            = smol
-
-;Value for cubic spline window. Only used in case of srfm = spl2 or spl4.
-swin 		= 0.30
-
-;Numebr of grid point per A^2. Not used when (srad = 0.0) or (srfm = spl2 or spl4)
-sdens 		= 10
-
-;Temperature in K
-temp 		= 300
-
-;Type of boundary condition to solve PB equation. bcfl = zero or sdh or mdh or focus or map
-bcfl 		= mdh
-
-;Non-linear (npbe) or linear (lpbe) PB equation to solve
-PBsolver 	= lpbe
 
 
 ;========================================================

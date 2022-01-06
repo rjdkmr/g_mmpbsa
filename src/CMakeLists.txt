@@ -101,7 +101,7 @@ add_definitions( ${GROMACS_DEFINITIONS} )
 ##############################################################
 
 
-add_executable(g_mmpbsa main.cpp)
+add_executable(g_mmpbsa main.cpp nsc.cpp)
 SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 17)
 target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
 	

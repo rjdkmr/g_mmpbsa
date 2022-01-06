@@ -10,7 +10,7 @@ cfac 		= 1.5
 ;The desired fine mesh spacing (in A)
 gridspace 	= 0.5
 
-:Amount (in A) to add to molecular dimensions to get fine grid dimensions.
+;Amount (in A) to add to molecular dimensions to get fine grid dimensions.
 fadd 		= 5
 
 ;Maximum memory (in MB) available per-processor for a calculation.

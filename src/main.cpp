@@ -6,15 +6,20 @@
 
 #include <gromacs/trajectoryanalysis.h>
 #include "gromacs/trajectoryanalysis/topologyinformation.h"
-#include "gromacs/topology/exclusionblocks.h"
 #include "gromacs/utility/futil.h"
-
 #include "gromacs/utility/filestream.h"
-#include "gromacs/utility/cstringutil.h"
 #include "gromacs/fileio/readinp.h"
 #include "gromacs/fileio/warninp.h"
 
 using namespace gmx;
+
+#define FLAG_DOTS       01
+#define FLAG_VOLUME     02
+#define FLAG_ATOM_AREA  04
+extern int nsc_dclm(rvec *coords, real *radius, int nat, int  densit,
+                    int mode, real *value_of_area, double **at_area,
+                    real *value_of_vol, double ** at_vol, real **lidots,
+                    int *nu_dots, int index[]);
 
 /**
 * @brief Data structure to hold information about non-bonded interactions
@@ -89,7 +94,6 @@ typedef struct {
 */
 enum { eSASRAD, /**< For SASA model */
        eSAVRAD, /**< For SAV model */
-       eWCARAD, /**< For WCA model */
      };
 
 /**
@@ -174,9 +178,11 @@ private:
     t_pbsa_inputs                    pbsaInputKwords_;
     bool                             bPolar_ = false;
     bool                             bApolar_ = false;
+    bool                             bSASA_ = false;
+    bool                             bSAV_ = false;
 
-    AnalysisNeighborhood             nb_;
     AnalysisData                     mmEnergyData_;
+    AnalysisData                     apolarEnergyData_;
 
     // Varaible related to topology
     const gmx_mtop_t                 *mtop_;
@@ -190,13 +196,16 @@ private:
     std::vector<bool>                 bResA_ = { false }; // wheather a residue in subunit A
     std::vector<bool>                 bResB_ = { false }; // wheather a residue in subunit B
     
-    std::vector<real>                 radiiA_;
-    std::vector<real>                 radiiB_;
-    std::vector<real>                 radiiAB_;
+    // related to polar and apolar
+    real                              *radii_[2];          // radius for SASA/SAV calculation
+    real                              totalArea_[3];    // total area
+    real                              totalVolume_[3];  // volume
+    double                            *atomArea_[3];    // area atom-wise
+    double                            *atomVolume_[3];  // volume atom-wise
+    real                              *energyAtoms_[3]; // Polar/Apolar energy atom-wise
 
-
-    std::vector<real>              EEnergyFrame_ = { 0 };
-    std::vector<real>              VdwEnergyFrame_ = { 0 };
+    std::vector<real>                 EEnergyFrame_ = { 0 };
+    std::vector<real>                 VdwEnergyFrame_ = { 0 };
 
     void buildNonBondedPairList();
     void readPBSAInputs();
@@ -204,14 +213,13 @@ private:
     void vaccumMMWithoutExclusions(rvec *x);
     void prepareOutputFiles(const TrajectoryAnalysisSettings *settings);
     void assignRadius();
+    void writeOutputFrame(int frnr, real time, TrajectoryAnalysisModuleData *pdata);
+    std::vector<real> decomposeSolvationEnergy();
 
 };
 
 
-AnalysisTemplate::AnalysisTemplate()
-{
-    registerAnalysisDataset(&mmEnergyData_, "mmEnergy");
-}
+
 
 void
 AnalysisTemplate::initOptions(IOptionsContainer          *options,
@@ -329,7 +337,7 @@ void AnalysisTemplate::optionsFinished(TrajectoryAnalysisSettings *)
         bDCOMP_ = false;
     }
 
-    if ((fnDecompMM_.empty()) && (bDCOMP_)) {
+    if ((fnDecompMM_.empty()) && (bDCOMP_) && (bMM_)) {
         GMX_THROW(InconsistentInputError("Decompositon requested, however. -mmcon option is missing. Aborting!!!\n"));
     }
 
@@ -345,11 +353,34 @@ void AnalysisTemplate::optionsFinished(TrajectoryAnalysisSettings *)
     }
 
     if ((bPBSA_) && (fnMDP_.empty())) {
-        GMX_THROW(InconsistentInputError("Input parameter file for the PBSA calculation is missing, use \"-i\" option\n"));
+        GMX_THROW(InconsistentInputError("Input parameter file for the PBSA calculation is missing, Use \"-i\" option\n"));
     }
 
-    if(bPBSA_)
+    if(bPBSA_) {
         readPBSAInputs();
+        
+        if ((bPolar_) && (fnPolar_.empty()))  {
+            GMX_THROW(InconsistentInputError("Polar output file is missing. Use \"-pol\" option\n"));
+        }
+        
+        if ((bPolar_) && (fnDecompPol_.empty()))  {
+            GMX_THROW(InconsistentInputError("Decompositon requested, however. -pcon option is missing. Aborting!!!\n"));
+        }
+        
+        if((bApolar_) && (pbsaInputKwords_.gamma != 0))
+            bSASA_ = true;
+        
+        if((bApolar_) && (pbsaInputKwords_.press != 0))
+            bSAV_ = true;
+        
+        if ((bApolar_) && (fnAPolar_.empty()))  {
+            GMX_THROW(InconsistentInputError("Apolar output file is missing. Use \"-apol\" option\n"));
+        }
+        
+        if ((bPolar_) && (fnDecompAPol_.empty()))  {
+            GMX_THROW(InconsistentInputError("Decompositon requested, however. -apcon option is missing. Aborting!!!\n"));
+        }
+    }
 }
 
 
@@ -426,12 +457,21 @@ AnalysisTemplate::initAnalysis(const TrajectoryAnalysisSettings &settings,
         }
     }
 
+    // Prepare output data and files 
     prepareOutputFiles(&settings);
 
+    // build non-bonded pairs
     if (bIncl14_) buildNonBondedPairList();
     
     if(bPBSA_) {
-        assignRadius();
+        
+        assignRadius(); // assign radius to all atoms
+        
+        if(bDCOMP_) {
+            for(int i = 0; i < 3; i++) { // energy atom-wise memory allocation
+                snew(energyAtoms_[i], isize_[i]);
+            }
+        }
     }
 }
 
@@ -440,8 +480,6 @@ void
 AnalysisTemplate::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc,
                                TrajectoryAnalysisModuleData *pdata)
 {
-    AnalysisDataHandle   mmh         = pdata->dataHandle(mmEnergyData_);
-
     // Electrostatic energy calculation
     if (bMM_) {
         if (bIncl14_) {
@@ -449,10 +487,42 @@ AnalysisTemplate::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc,
         } else {
             vaccumMMWithoutExclusions(fr.x);
         }
+    }
+    
+    // Apolar calculation
+    if (bApolar_) {
+        real tmparea; // it is required and discarded
+        for (int i = 0; i < 3; i++) {
+            
+            // Calculate area
+            nsc_dclm(fr.x, radii_[eSASRAD], isize_[i], ndots_, FLAG_ATOM_AREA,
+                     &totalArea_[i],  &atomArea_[i], NULL, NULL, NULL, NULL,
+                     (int *) index_[i]);
+            
+            // Calculate volume
+            nsc_dclm(fr.x, radii_[eSAVRAD], isize_[i],  ndots_, FLAG_VOLUME,
+                     &tmparea, NULL, &totalVolume_[i], &atomVolume_[i], NULL, NULL,
+                     (int *) index_[i]);
+            
+            if ((!bDIFF_) && (i > 0))
+                break;
+        }
+        
+    }
+    
+    // write output data for each frame
+    writeOutputFrame(frnr, fr.time, pdata);
 
+}
 
-
-        mmh.startFrame(frnr, fr.time);
+void AnalysisTemplate::writeOutputFrame(int frnr, real time, gmx::TrajectoryAnalysisModuleData* pdata)
+{
+    // Vacumm MM energy ouput
+    if(bMM_){
+        AnalysisDataHandle   mmh         = pdata->dataHandle(mmEnergyData_);
+        
+        // write to -mm energy_MM.xvg
+        mmh.startFrame(frnr, time);
         if (bDIFF_) {
             for(int i=0; i<3; i++)  {
                 mmh.setPoint((i*2), VdwEnergyFrame_[i]);
@@ -467,8 +537,9 @@ AnalysisTemplate::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc,
         mmh.finishFrame();
 
 
+        // write to -mmcon file
         if(bDCOMP_) {
-            fprintf(fDecompMM_, "%15.3lf", fr.time);
+            fprintf(fDecompMM_, "%15.3lf", time);
 
             for(int i = 0; i < atoms_->nres; i++)
                 if( (bResA_[i]) || (bResB_[i]) )
@@ -477,11 +548,88 @@ AnalysisTemplate::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc,
             fflush(fDecompMM_);
         }
     }
+    
+    // Apolar solvation energy output
+    if(bApolar_) {
+        AnalysisDataHandle  aphand         = pdata->dataHandle(apolarEnergyData_);
+        
+        // write to -apol apolar.xvg file after calculating energy from area/volume
+        aphand.startFrame(frnr, time);
+        if(bDIFF_) {
+            if(bSASA_) {
+                aphand.setPoint(0, (totalArea_[0] * pbsaInputKwords_.gamma * 100) + pbsaInputKwords_.sasaconst);
+                aphand.setPoint(1, (totalArea_[1] * pbsaInputKwords_.gamma * 100) + pbsaInputKwords_.sasaconst);
+                aphand.setPoint(2, (totalArea_[2] * pbsaInputKwords_.gamma * 100) + pbsaInputKwords_.sasaconst);
+            } else {
+                aphand.setPoint(0, 0.0);
+                aphand.setPoint(1, 0.0);
+                aphand.setPoint(2, 0.0);
+            }
+            
+            if(bSAV_) {
+                aphand.setPoint(3, (totalVolume_[0] * pbsaInputKwords_.press * 1000) + pbsaInputKwords_.savconst);
+                aphand.setPoint(4, (totalVolume_[1] * pbsaInputKwords_.press * 1000) + pbsaInputKwords_.savconst);
+                aphand.setPoint(5, (totalVolume_[2] * pbsaInputKwords_.press * 1000) + pbsaInputKwords_.savconst);
+            } else {
+                aphand.setPoint(3, 0.0);
+                aphand.setPoint(4, 0.0);
+                aphand.setPoint(5, 0.0);
+            } 
 
-
-
-
+        } else {
+            real energy = 0;
+            if(bSASA_)  {
+                energy = (totalArea_[0] * pbsaInputKwords_.gamma * 100) + pbsaInputKwords_.sasaconst;
+                aphand.setPoint(0, (totalArea_[0] * pbsaInputKwords_.gamma * 100) + pbsaInputKwords_.sasaconst);
+            } else {
+                aphand.setPoint(0, 0.0);
+            }
+            
+            if(bSAV_) {
+                energy += (totalVolume_[0] * pbsaInputKwords_.press * 1000) + pbsaInputKwords_.savconst;
+                aphand.setPoint(1, (totalVolume_[0] * pbsaInputKwords_.press * 1000) + pbsaInputKwords_.savconst);
+            } else {
+                aphand.setPoint(1, 0.0);
+            }
+            
+            aphand.setPoint(2, energy);
+        }
+        aphand.finishFrame();
+        
+        // write to -pcon file
+        if(bDCOMP_) {
+            for(int i = 0; i < 3; i++) { // calculate atom-wise energies
+                for(int j = 0; j < isize_[i]; j++) {
+                    energyAtoms_[i][j] = 0.0;
+                    
+                    if (bSASA_) 
+                        energyAtoms_[i][j] += (atomArea_[i][j] * pbsaInputKwords_.gamma * 100) + pbsaInputKwords_.sasaconst;
+                    
+                    if(bSAV_)
+                        energyAtoms_[i][j] += (atomVolume_[i][j] * pbsaInputKwords_.press * 1000) + pbsaInputKwords_.savconst;
+                }
+            }
+            
+            // calculate residue-wise energies
+            std::vector<real> resEnergy =  decomposeSolvationEnergy();
+            
+            // write residue-wise energies to file
+            fprintf(fDecompAPol_, "%15.3lf", time);
+            for(int i=0; i < atoms_->nres; i++)
+                if((bResA_[i]) || (bResB_[i]))
+                    fprintf(fDecompAPol_, "%15.3lf", resEnergy[i]);
+        }
+        
+        // free memory of atomArea_ atomVolume_, these will be again allocated in next frame
+        for (int i = 0; i < 3; i++) {
+            sfree(atomArea_[i]);
+            sfree(atomVolume_[i]);
+            if ((!bDIFF_) && (i > 0))
+                break;
+        }
+    }
 }
+
 
 
 void
@@ -868,6 +1016,51 @@ void AnalysisTemplate::prepareOutputFiles(const TrajectoryAnalysisSettings *sett
             fprintf(fDecompMM_,"\n");
         }
     }
+    
+    if (bApolar_) {
+        int apolrColumnCount = (bDIFF_) ? 6 : 3;
+        std::vector<std::string> apolarLegends;
+        
+        if (bDIFF_){
+            apolarLegends.push_back(std::string(selA_.name()) +  "-Surf-ten energy");
+            apolarLegends.push_back(std::string(selB_.name()) +  "-Surf-ten energy");
+            apolarLegends.push_back(std::string(selA_.name()) + "+" + std::string(selB_.name())+  "-Surf-ten energy");
+            
+            apolarLegends.push_back(std::string(selA_.name()) +  "-Press-Vol energy");
+            apolarLegends.push_back(std::string(selB_.name()) +  "-Press-Vol energy");
+            apolarLegends.push_back(std::string(selA_.name()) + "+" + std::string(selB_.name())+  "-Press-Vol energy");
+        } else {
+            apolarLegends.push_back(std::string(selA_.name()) +  "-Surf-ten energy");
+            apolarLegends.push_back(std::string(selA_.name()) +  "-Press-Vol energy");
+            apolarLegends.push_back(std::string(selA_.name()) +  "Total energy");
+        }
+        
+        apolarEnergyData_.setColumnCount(0, apolrColumnCount);
+        {
+            AnalysisDataPlotModulePointer plotm(new AnalysisDataPlotModule(settings->plotSettings()));
+            plotm->setFileName(fnAPolar_);
+            plotm->setTitle("Apolar solvation energy)");
+            plotm->setXAxisIsTime();
+            plotm->setYLabel("Energy (kJ/mol)");
+            for (size_t i = 0; i < apolrColumnCount; ++i)
+            {
+                plotm->appendLegend(apolarLegends[i]);
+            }
+            apolarEnergyData_.addModule(plotm);
+        }
+        
+        if (bDCOMP_) {
+            fDecompAPol_ = gmx_ffopen(fnDecompAPol_, "w");
+            fprintf(fDecompAPol_, "# Time\t");
+            for(int i=0; i < atoms_->nres; i++)
+            {
+                if((bResA_[i]) || (bResB_[i])) {
+                    fprintf(fDecompAPol_,"%s-%d\t", *(atoms_->resinfo[i].name), atoms_->resinfo[i].nr);
+                }
+            }
+            fprintf(fDecompAPol_,"\n");
+        }
+    }
 }
 
 void AnalysisTemplate::readPBSAInputs()
@@ -887,7 +1080,7 @@ void AnalysisTemplate::readPBSAInputs()
     if (polar == "yes") bPolar_ = true;
 
     std::string apolar = get_estr(&inp, "apolar", nullptr);
-    if (polar == "yes") bApolar_ = true;
+    if (apolar == "yes") bApolar_ = true;
 
 
     if(bPolar_)
@@ -919,19 +1112,26 @@ void AnalysisTemplate::readPBSAInputs()
         pbsaInputKwords_.bcfl      = get_eeenum(&inp, "bcfl", bcfl_words, wi);
         pbsaInputKwords_.pbsolver  = get_eeenum(&inp, "PBsolver", PBsolver, wi);
 
+
+
+    }
+    
+    if (bApolar_) {
+        pbsaInputKwords_.srad      = get_ereal(&inp, "srad",    1.4,  wi); // same for SASA and SAV
+        
         pbsaInputKwords_.gamma     = get_ereal(&inp, "gamma",    0.030096,  wi);
         pbsaInputKwords_.sasaconst = get_ereal(&inp, "sasconst",    0,  wi);
+        pbsaInputKwords_.sasrad = get_ereal(&inp, "sasrad",    1.4,  wi);
 
         pbsaInputKwords_.press     = get_ereal(&inp, "press",       0,  wi);
         pbsaInputKwords_.savconst  = get_ereal(&inp, "savconst",    0,  wi);
-
+        pbsaInputKwords_.savrad = get_ereal(&inp, "savrad",    1.29,  wi);
     }
 
 }
 
 void AnalysisTemplate::assignRadius()
-{
-
+{  
     std::map<std::string, real> radiusDef = {
         {"o",  1.520},
         {"s",  1.830},
@@ -959,16 +1159,8 @@ void AnalysisTemplate::assignRadius()
         {"mw", 0.050}, // virtual-sites pr sigma-holes
     };
     
-    int isize;
-    const int *index;
-    if (bDIFF_) {
-        isize = isize_[2];
-        index = index_[2];
-    } else {
-        isize = isize_[0];
-        index = index_[0];
-    }
-    
+    snew(radii_[eSASRAD], atoms_->nr);
+    snew(radii_[eSAVRAD], atoms_->nr);
     if (atoms_->pdbinfo == nullptr) {
         snew(atoms_->pdbinfo, atoms_->nr);
     } else {
@@ -979,12 +1171,12 @@ void AnalysisTemplate::assignRadius()
     int itype, ntype = mtop_->atomtypes.nr;
     real c6, c12, sig6, rad = -1;
     std::string atomtype, atomname, atomname2, atomtype2;
-    for (int i = 0; i < isize; i++) {      // get charge and radius for all atoms
+    for (int i = 0; i < atoms_->nr; i++) {      // get charge and radius for all atoms
         rad = -1;
         
         // calculate radius from force-field parameters
         // if radius is not found later on, force-field radius will be used
-        itype = atoms_->atom[index[i]].type;
+        itype = atoms_->atom[i].type;
         c12 = localtop_->idef.iparams[itype * ntype + itype].lj.c12;
         c6 =  localtop_->idef.iparams[itype * ntype + itype].lj.c6;
         if ((c6 != 0) && (c12 != 0)) {
@@ -997,10 +1189,10 @@ void AnalysisTemplate::assignRadius()
         rad *= 10; //Conversion of nano meter to angstroms
         
         // Try to find radius based on atomname and atomtype
-        atomtype = *(atoms_->atomtype[index[i]]);
+        atomtype = *(atoms_->atomtype[i]);
         std::transform(atomtype.begin(), atomtype.end(), atomtype.begin(), [](unsigned char c){ return std::tolower(c); });
         
-        atomname = *(atoms_->atomname[index[i]]);
+        atomname = *(atoms_->atomname[i]);
         std::transform(atomname.begin(), atomname.end(), atomname.begin(), [](unsigned char c){ return std::tolower(c); });
         
         // First assign on the basis of element, i.e. first charecter of atomname
@@ -1019,28 +1211,42 @@ void AnalysisTemplate::assignRadius()
                     rad = radiusDef[atomtype];
       
         // Assigned charge and radius to ocuppancy and bfactor field
-        atoms_->pdbinfo[index[i]].occup = atoms_->atom[index[i]].q;
-        atoms_->pdbinfo[index[i]].bfac = rad;
-    }
-    
-    // First index group
-    for (int i = 0; i < isize_[0]; i++)
-        radiiA_.push_back((atoms_->pdbinfo[index_[0][i]].bfac + pbsaInputKwords_.srad)/10);
+        atoms_->pdbinfo[i].occup = atoms_->atom[i].q;
+        atoms_->pdbinfo[i].bfac = rad;
         
-    if (bDIFF_) {
-        // Second index group
-        for (int i = 0; i < isize_[1]; i++)
-            radiiB_.push_back((atoms_->pdbinfo[index_[1][i]].bfac + pbsaInputKwords_.srad)/10);
-        
-        // combined index group
-        radiiAB_.insert( radiiAB_.end(), radiiA_.begin(), radiiA_.end() );
-        radiiAB_.insert( radiiAB_.end(), radiiB_.begin(), radiiB_.end() );
+        radii_[eSASRAD][i] = (rad + pbsaInputKwords_.sasrad)/10;
+        radii_[eSAVRAD][i] = (rad + pbsaInputKwords_.savrad)/10;
     }
-    
     
 }
 
+std::vector<real> AnalysisTemplate::decomposeSolvationEnergy() {
+    std::vector<real> ResOnly(atoms_->nres, 0.0), ResComplex(atoms_->nres, 0.0), ResEnergy(atoms_->nres, 0.0);
 
+    //Residues in Complex
+    for (int i=0; i < isize_[2]; i++ )
+        ResComplex[atoms_->atom[index_[2][i]].resind] += energyAtoms_[2][i];
+
+    //Residues in A only
+    for (int i=0; i < isize_[0]; i++ )
+        ResOnly[atoms_->atom[index_[0][i]].resind] += energyAtoms_[0][i];
+
+    //Residues in B only
+    for (int i=0; i < isize_[1]; i++ )
+        ResOnly[atoms_->atom[index_[1][i]].resind] += energyAtoms_[1][i];
+
+    for (int i=0; i < atoms_->nres; i++ )
+        ResEnergy[i] = ( ResComplex[i] - ResOnly[i] );
+    
+    
+    return ResEnergy;
+}
+
+AnalysisTemplate::AnalysisTemplate()
+{
+    registerAnalysisDataset(&mmEnergyData_, "mmEnergy");
+    registerAnalysisDataset(&apolarEnergyData_, "apolarEnergy");
+}
 
 /*! \brief
  * The main function for the analysis template.
