@@ -105,7 +105,9 @@ add_executable(g_mmpbsa main.cpp nsc.cpp)
 SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 17)
 target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
 	
-
+add_executable(energy2bfac energy2bfac.cpp)
+SET_TARGET_PROPERTIES(energy2bfac PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 17)
+target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
 
 install(TARGETS g_mmpbsa DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
-# install(TARGETS energy2bfac DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
+install(TARGETS energy2bfac DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
