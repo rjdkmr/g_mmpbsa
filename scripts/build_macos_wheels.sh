@@ -3,8 +3,7 @@ set -e -x
 
 CWD=`pwd`
 
-brew install gcc@14 libomp gsl fftw pyenv eigen arpack \
-             boost openblas lapack suite-sparse
+brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse
 brew cleanup
 
 eval "$(pyenv init -)"
@@ -32,10 +31,12 @@ cd external
 mkdir apbs_installed
 mkdir gmx_installed
 
-echo ${PKG_CONFIG_PATH}
 export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:${PKG_CONFIG_PATH}"
-export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib -lopenblas -lvf2c"
-export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
+export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib"
+export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include"
+
+#export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib"
+#export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
 
 export CC=gcc-14
 export CXX=g++-14
@@ -68,8 +69,8 @@ cmake .. \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive" \
-  -DCMAKE_CC_COMIPLER=gcc-14 \
-  -DCMAKE_CXX_COMIPLER=g++-14 \
+  -DCMAKE_CC_COMIPLER=${CC} \
+  -DCMAKE_CXX_COMIPLER=${CXX} \
   -DCMAKE_VERBOSE_MAKEFILE=ON
 
 make 
