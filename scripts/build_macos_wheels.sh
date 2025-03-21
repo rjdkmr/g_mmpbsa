@@ -3,7 +3,8 @@ set -e -x
 
 CWD=`pwd`
 
-brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse
+brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse openblas
+brew link --force openblas
 brew cleanup
 
 eval "$(pyenv init -)"
@@ -31,7 +32,7 @@ cd external
 mkdir apbs_installed
 mkdir gmx_installed
 
-export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:${PKG_CONFIG_PATH}"
+# export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:${PKG_CONFIG_PATH}"
 export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib"
 export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include"
 
