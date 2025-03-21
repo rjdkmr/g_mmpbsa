@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - matplotlib
+  - pybind11
+  - gxx
+  - cmake
+  - jupyterlab
+  - pkgconfig
+  - openblas
+  - lapack
+  - f2c
+  - suitesparse
+  - arpack
+  - boost
+  - eigen
+  - sphinx
+  - sphinx-rtd-theme

@@ -50,14 +50,7 @@ Version v2.0 Release Notes
 *   This tool can be modified and/or redistributed under terms of GNU public license.
 
 
-Removed features from previous versions
-=======================================
 
-*   Removed internal APBS linking, now always requires an external APBS program.
-
-*   Removed van der Waal radii options. Now by default only Bondii radii is used. Any missing radius is taken from force-field parameters.
-
-*   Weeks–Chandler–Andersen (WCA) non-polar solvation model is removed.
 
 
 
