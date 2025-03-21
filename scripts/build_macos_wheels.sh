@@ -3,7 +3,7 @@ set -e -x
 
 CWD=`pwd`
 
-brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse openblas
+brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
 brew link --force openblas
 brew cleanup
 
@@ -32,15 +32,14 @@ cd external
 mkdir apbs_installed
 mkdir gmx_installed
 
-# export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:${PKG_CONFIG_PATH}"
-export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib"
-export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include"
-
-#export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib"
-#export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
-
 export CC=gcc-14
 export CXX=g++-14
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
+#export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib"
+#export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+#export CFLAGS="${CFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+#export CXXFLAGS="${CXXFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
 export APBS_INSTALL=${CWD}/external/apbs_installed
 
@@ -69,7 +68,11 @@ cmake .. \
   -DENABLE_TESTS=OFF \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
-  -DCMAKE_C_FLAGS="-fpermissive" \
+  -DCMAKE_C_FLAGS="-fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include" \
+  -DCMAKE_CXX_FLAGS="-I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include" \
+  -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib" \
+  -DCMAKE_MODULE_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib" \
+  -DCMAKE_SHARED_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib" \
   -DCMAKE_CC_COMIPLER=${CC} \
   -DCMAKE_CXX_COMIPLER=${CXX} \
   -DCMAKE_VERBOSE_MAKEFILE=ON
