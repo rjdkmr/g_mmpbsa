@@ -36,6 +36,7 @@ export CC=gcc-14
 export CXX=g++-14
 export CMAKE_FIND_FRAMEWORK=NEVER
 export CMAKE_FIND_APPBUNDLE=NEVER
+export BLA_STATIC=OFF
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/openblas/lib/pkgconfig"
 export LDFLAGS="${LDFLAGS} -L/opt/homebrew/libomp/lib -L/opt/homebrew/openblas/lib"
 export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/libomp/include -I/opt/homebrew/openblas/include"
@@ -67,7 +68,7 @@ cmake .. \
   -DENABLE_PBSAM=OFF \
   -DENABLE_PYTHON=OFF \
   -DENABLE_TESTS=OFF \
-  -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
+  -DFETK_VERSION=86e074ecfa19b818e1896ea44082d14bc7e44082 \
   -DGET_NanoShaper=OFF \
   -DCMAKE_PREFIX_PATH="/opt/homebrew" \
   -DCMAKE_C_FLAGS="-fpermissive " \
