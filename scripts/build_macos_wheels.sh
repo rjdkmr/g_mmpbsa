@@ -34,7 +34,8 @@ mkdir gmx_installed
 
 export CC=gcc-14
 export CXX=g++-14
-
+export CMAKE_FIND_FRAMEWORK=NEVER
+export CMAKE_FIND_APPBUNDLE=NEVER
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
 export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib"
 export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
@@ -68,8 +69,9 @@ cmake .. \
   -DENABLE_TESTS=OFF \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
-  -CMAKE_PREFIX_PATH="/opt/homebrew/opt" \
+  -DCMAKE_PREFIX_PATH="/opt/homebrew/opt" \
   -DCMAKE_C_FLAGS="-fpermissive " \
+  -DCMAKE_FIND_FRAMEWORK=NEVER \
   -DCMAKE_FIND_APPBUNDLE=NEVER \
   -DCMAKE_C_COMIPLER=${CC} \
   -DCMAKE_CXX_COMIPLER=${CXX} \
@@ -103,7 +105,7 @@ do
     pyenv global $PYTHON
     echo $(python --version)
     GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} python -m pip install -v --no-deps --no-cache-dir .
-    # otool -L build/lib.*/gmx_clusterByFeatures/*.so
+    otool -L build/lib.*/gmx_clusterByFeatures/*.so
     install_name_tool -change @rpath/libgromacs.2.dylib ${GMX_INSTALL}/lib/libgromacs.dylib build/lib.*/g_mmpbsa/*.so
     GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} APBS_INSTALL=${APBS_INSTALL} python -m pip wheel -v -w temp_wheels/ --no-deps --no-cache-dir .
     python -m pip uninstall -y g_mmpbsa
