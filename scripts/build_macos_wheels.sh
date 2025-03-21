@@ -37,11 +37,11 @@ export CXX=g++-14
 export CMAKE_FIND_FRAMEWORK=NEVER
 export CMAKE_FIND_APPBUNDLE=NEVER
 export BLA_STATIC=OFF
-export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/openblas/lib/pkgconfig"
-export LDFLAGS="${LDFLAGS} -L/opt/homebrew/libomp/lib -L/opt/homebrew/openblas/lib"
-export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/libomp/include -I/opt/homebrew/openblas/include"
-export CFLAGS="${CFLAGS} -I/opt/homebrew/libomp/include -I/opt/homebrew/openblas/include"
-export CXXFLAGS="${CXXFLAGS} -I/opt/homebrew/libomp/include -I/opt/homebrew/openblas/include"
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
+export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib -lopenblas"
+export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CFLAGS="${CFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CXXFLAGS="${CXXFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
 export APBS_INSTALL=${CWD}/external/apbs_installed
 
@@ -70,7 +70,7 @@ cmake .. \
   -DENABLE_TESTS=OFF \
   -DFETK_VERSION=86e074ecfa19b818e1896ea44082d14bc7e44082 \
   -DGET_NanoShaper=OFF \
-  -DCMAKE_PREFIX_PATH="/opt/homebrew" \
+  -DCMAKE_PREFIX_PATH="/opt/homebrew/opt" \
   -DCMAKE_C_FLAGS="-fpermissive " \
   -DCMAKE_FIND_FRAMEWORK=NEVER \
   -DCMAKE_FIND_APPBUNDLE=NEVER \
