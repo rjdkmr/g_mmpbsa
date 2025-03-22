@@ -34,11 +34,8 @@ mkdir gmx_installed
 
 export CC=gcc-14
 export CXX=g++-14
-export CMAKE_FIND_FRAMEWORK=NEVER
-export CMAKE_FIND_APPBUNDLE=NEVER
-export BLA_STATIC=OFF
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
-export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib -lopenblas -lm"
+export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib -lm"
 export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 export CFLAGS="${CFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 export CXXFLAGS="${CXXFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
@@ -76,6 +73,7 @@ cmake .. \
   -DCMAKE_FIND_APPBUNDLE=NEVER \
   -DCMAKE_C_COMIPLER=${CC} \
   -DCMAKE_CXX_COMIPLER=${CXX} \
+  -DBLA_STATIC=OFF   \
   -DCMAKE_VERBOSE_MAKEFILE=ON
 
 make 
