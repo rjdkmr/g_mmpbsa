@@ -16,9 +16,9 @@ export CC=gcc-14
 export CXX=g++-14
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
 export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib -lm"
-export CPPFLAGS="${CPPFLAGS} -fpremissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-export CFLAGS="${CFLAGS} -fpremissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-export CXXFLAGS="${CXXFLAGS} -fpremissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CPPFLAGS="${CPPFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CFLAGS="${CFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CXXFLAGS="${CXXFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
 wget -nv https://github.com/Electrostatics/FETK/archive/refs/tags/1.9.3.tar.gz -O fetk.tar.gz
 tar -zxf fetk.tar.gz
