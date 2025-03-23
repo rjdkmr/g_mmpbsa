@@ -26,8 +26,6 @@ cd FETK-1.9.3
 mkdir build
 cd build
 cmake .. \
-      -DBLA_STATIC=ON \
-      -DBUILD_SUPERLU=OFF \
       -DCMAKE_FIND_FRAMEWORK=NEVER \
       -DCMAKE_FIND_APPBUNDLE=NEVER \
       -DCMAKE_INSTALL_PREFIX=${CWD}/external/fetk_installed
