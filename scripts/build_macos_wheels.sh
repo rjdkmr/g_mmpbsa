@@ -16,16 +16,20 @@ export CC=gcc-14
 export CXX=g++-14
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
 export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib -lm"
-export CPPFLAGS="${CPPFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-export CFLAGS="${CFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-export CXXFLAGS="${CXXFLAGS} -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CPPFLAGS="${CPPFLAGS} -fpremissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CFLAGS="${CFLAGS} -fpremissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+export CXXFLAGS="${CXXFLAGS} -fpremissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
-wget https://github.com/Electrostatics/FETK/archive/refs/tags/1.9.3.tar.gz -O fetk.tar.gz
+wget -nv https://github.com/Electrostatics/FETK/archive/refs/tags/1.9.3.tar.gz -O fetk.tar.gz
 tar -zxf fetk.tar.gz
 cd FETK-1.9.3
 mkdir build
 cd build
-cmake .. -DBLA_STATIC=OFF -DBUILD_SUPERLU=OFF -DCMAKE_INSTALL_PREFIX=${CWD}/external/fetk_installed
+cmake .. -DBLA_STATIC=ON \ 
+         -DBUILD_SUPERLU=OFF   \
+         -DCMAKE_FIND_FRAMEWORK=NEVER \
+         -DCMAKE_FIND_APPBUNDLE=NEVER \
+         -DCMAKE_INSTALL_PREFIX=${CWD}/external/fetk_installed
 make
 make install
 cd ${CWD}/external
