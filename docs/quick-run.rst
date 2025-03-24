@@ -33,6 +33,8 @@ An example `mmpbsa.mdp <https://github.com/rjdkmr/g_mmpbsa/blob/master/test/pola
 
 **All energetic term with energy decomposition**
 
+.. ::bash
+
     g_mmpbsa run -f traj.xtc            -s topol.tpr \
                  -i mmpbsa.mdp          -n index.ndx -pbsa \
                  -mm energy_MM.xvg      -pol polar.xvg \
@@ -43,7 +45,7 @@ An example `mmpbsa.mdp <https://github.com/rjdkmr/g_mmpbsa/blob/master/test/pola
 
 Parallel computation using `OpenMP`
 -----------------------------------
-g_mmpbsa inherits OpenMP parallel comuputation implemented in APBS and also implement MM energy calculations in parallel.
+g_mmpbsa inherits OpenMP parallel computation implemented in APBS and also implement MM energy calculations in parallel.
 This parallel support is enabled by default and all processors/core will be used during runtime.
 
 To control the usage of processors/cores, number of threads can be changed by defining environment variable. For example in bash, one can write following command:
@@ -52,4 +54,4 @@ To control the usage of processors/cores, number of threads can be changed by de
 
 where `X` is number of core/processors.
 
-------
+***

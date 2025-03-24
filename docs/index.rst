@@ -52,5 +52,5 @@ Please always cite following three publications
    :caption: Contents:
 
       Download and Installation <install>
-      Getteing started with MM/PBSA calculation <quick-run>
+      Getting started with MM/PBSA calculation <quick-run>
 
