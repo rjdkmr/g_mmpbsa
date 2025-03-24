@@ -14,46 +14,21 @@ mkdir fetk_installed
 
 export CC=gcc-14
 export CXX=g++-14
+export BLA_VENDOR=OpenBLAS
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
-export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib -lm"
+export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib"
 export CPPFLAGS="${CPPFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 export CFLAGS="${CFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 export CXXFLAGS="${CXXFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
-wget -nv https://github.com/Electrostatics/FETK/archive/refs/tags/1.9.3.tar.gz -O fetk.tar.gz
-tar -zxf fetk.tar.gz
-cd FETK-1.9.3
-mkdir build
-cd build
-cmake .. \
-      -DBLA_STATIC=OFF \
-      -DBUILD_SUPERLU=OFF \
-      -DCMAKE_FIND_FRAMEWORK=NEVER \
-      -DCMAKE_FIND_APPBUNDLE=NEVER \
-      -DCMAKE_INSTALL_PREFIX=${CWD}/external/fetk_installed
-make
-make install
-cd ${CWD}/external
-
-cd apbs/
-sed "-i" "" "-e" "s/include\(ImportFETK\)//g" CMakeLists.txt
-sed "-i" "" "-e" "s/import_fetk\(\${FETK_VERSION}\)//g" CMakeLists.txt
-cat CMakeLists.txt
-
 mkdir build && cd build
-
-export APBS_INSTALL=${CWD}/external/apbs_installed
-export LDFLAGS="${LDFLAGS} -L${CWD}/external/fetk_installed/lib"
-export CPPFLAGS="${CPPFLAGS} -I${CWD}/external/fetk_installed/include"
-export CFLAGS="${CFLAGS} -I${CWD}/external/fetk_installed/include"
-export CXXFLAGS="${CXXFLAGS} -I${CWD}/external/fetk_installed/include"
 
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
   -DBUILD_DOC=OFF \
   -DAPBS_STATIC_BUILD=OFF  \
   -DBUILD_TOOLS=OFF \
-  -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=${APBS_INSTALL} \
   -DENABLE_PYGBE=OFF \
   -DENABLE_BEM=OFF \
@@ -67,9 +42,7 @@ cmake .. \
   -DGET_NanoShaper=OFF \
   -DCMAKE_FIND_FRAMEWORK=NEVER \
   -DCMAKE_FIND_APPBUNDLE=NEVER \
-  -DCMAKE_MODULE_PATH=${CWD}/external/fetk_installed/share/fetk/cmake   \
-  -DAPBS_LIBS=mc;maloc \
-  -DHOMEBREW_ALLOW_FETCHCONTENT=OFF \
+  -DFETK_VERSION="1.9.3" \
   -DCMAKE_VERBOSE_MAKEFILE=ON
 
 make 
