@@ -4,8 +4,13 @@ set -e -x
 CWD=`pwd`
 
 brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
+brew install brewsci/bio/apbs
 # brew link --force openblas libomp
 brew cleanup
+
+ls -lhrt /opt/homebrew/opt/apbs/
+ls -lhrt /opt/homebrew/opt/apbs/lib
+ls -lhrt /opt/homebrew/opt/apbs/include
 
 cd external
 mkdir apbs_installed
