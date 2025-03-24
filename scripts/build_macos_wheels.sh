@@ -14,11 +14,11 @@ mkdir fetk_installed
 
 #export CC=gcc-14
 #export CXX=g++-14
-export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
-export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib"
-export CPPFLAGS="${CPPFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-export CFLAGS="${CFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-export CXXFLAGS="${CXXFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+#export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
+#export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib"
+#export CPPFLAGS="${CPPFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+#export CFLAGS="${CFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
+#export CXXFLAGS="${CXXFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
 cd apbs
 mkdir build && cd build
@@ -40,8 +40,6 @@ cmake .. \
   -DENABLE_PYTHON=OFF \
   -DENABLE_TESTS=OFF \
   -DGET_NanoShaper=OFF \
-  -DCMAKE_FIND_FRAMEWORK=LAST \
-  -DCMAKE_FIND_APPBUNDLE=LAST \
   -DFETK_VERSION="57195e55351e04ce6ee0ef56a143c996a9aee7e2" \
   -DCMAKE_VERBOSE_MAKEFILE=ON
 
