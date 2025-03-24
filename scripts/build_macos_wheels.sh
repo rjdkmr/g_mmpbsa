@@ -21,6 +21,7 @@ export CPPFLAGS="${CPPFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/
 export CFLAGS="${CFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 export CXXFLAGS="${CXXFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
 
+cd apbs
 mkdir build && cd build
 
 cmake .. \
