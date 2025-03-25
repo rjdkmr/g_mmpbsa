@@ -35,7 +35,7 @@ The output from the tool is used further as input in python scripts which is pro
 Kindly post problems and queries in **|g_mmpbsa forum|**, we will try our best to provide the solution.
 
 
-***
+----
 
 Please always cite following three publications
 ------------------------------------------------
@@ -48,7 +48,7 @@ Please always cite following three publications
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
       Download and Installation <install>
