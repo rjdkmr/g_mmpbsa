@@ -1,47 +1,55 @@
----
-layout: page
----
-        
+Input Keywords for Non-polar Solvation Energy
+=============================================
 
-#### Input Keywords for Non-polar Solvation Energy
+apolar
+------
 
-##### apolar
-
+::
+    
     apolar            = yes
 
 
 This will specify whether to do non-polar calculation. Value `yes` will allow the calculation wheras value `no` will not allow the calculation.
 
+----
 
-#### <a name="sasa_model"></a> SASA model
+SASA model
+----------
 
-##### gamma
+gamma
+~~~~~
+
+::
 
     gamma            =  0.02267
 
-This specifies the surface tension proportionality term (kJ mol <sup>-1</sup> Å <sup>-2</sup> ) of the solvent. With `gamma = 0`, SASA energy is not calculated.
+This specifies the surface tension proportionality term (kJ mol $^{-1}</sup> Å <sup>-2</sup> ) of the solvent. With `gamma = 0`, SASA energy is not calculated.
 
-***
 
-##### sasaconst
+sasaconst
+~~~~~~~~~
+
+::
 
     sasaconst        = 3.84928
 
 Offset or constant `c` in (kJ mol<sup>-1</sup>) from _E_ =  _γ_ * _SASA_ + _c_
 
-***
+sasrad
+~~~~~~
 
-##### sasrad
+::
 
     sasrad           = 1.4
 
 Solvent probe radius in Å to calculate solvent accessible surface area.
 
-***
 
-#### <a name="sav_model"></a> SAV model
+----
 
-***
+SAV model
+---------
+
 
 ##### press
 

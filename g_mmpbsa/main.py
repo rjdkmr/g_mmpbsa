@@ -5,8 +5,8 @@ def main():
                'apbs' : 'apbs program used in PB calculation',
                'energy2bfac': 'Generate PDB file where decomposed binding energy is written in B-factor column',
                'average': 'Calculate final average binding energy including all energy terms. Supports multiple complexes at once.',
-               'correlation'   : 'Same as average, but also calculates correlation between predicted and experimental binding energies',
-               'decompose': 'Calculate final average decomposed energies of residues with plots',
+               'correlation'   : 'Same as average, but also calculates correlation between predicted and experimental binding energies.',
+               'decompose': 'Calculate final average decomposed energies of residues with plots.',
               }
 
     program = sys.argv[0]

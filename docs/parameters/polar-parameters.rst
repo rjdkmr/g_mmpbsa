@@ -1,8 +1,5 @@
----
-layout: page
----
-
-### Input Keywords for Polar Solvation Energy
+Input Keywords for Polar Solvation Energy
+=========================================
 
 
 ##### polar

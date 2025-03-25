@@ -18,22 +18,38 @@ For more details about ``g_mmpbsa run`` command, visit `usage <commands/run.html
 
 ::
 
-    g_mmpbsa run -f traj.xtc -s topol.tpr -n index.ndx -mme -mm energy_MM.xvg -decomp -mmcon contrib_MM.dat
+    g_mmpbsa run -f traj.xtc -s topol.tpr -n index.ndx -unit1 Protein -unit2 Ligand \
+                 -mme -mm energy_MM.xvg -decomp -mmcon contrib_MM.dat
      
      
+Here ``traj.xtc`` is the trajectory file, ``topol.tpr`` is the topology file,
+``index.ndx`` is the index file, ``Protein`` and ``Ligand`` are the group names 
+of protein and ligand in the index file.
+``energy_MM.xvg`` is the output file for MM energy and ``contrib_MM.dat`` 
+is the output file for energy decomposition.
+
 **Only polar solvation energy with energy decomposition**
 
 ::
 
-    g_mmpbsa run -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -nomme -pbsa -decomp -pol polar.xvg -pcon contrib_pol.dat
+    g_mmpbsa run -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx \
+                 -unit1 Protein -unit2 Ligand -nomme -pbsa -decomp \
+                 -pol polar.xvg -pcon contrib_pol.dat
 
+``polar.xvg`` is the output file for polar-solvation energy and ``contrib_pol.dat`` is the output file for energy decomposition.
 An example `mmpbsa.mdp <https://github.com/rjdkmr/g_mmpbsa/blob/master/test/polar_orig/mmpbsa.mdp>`_ file is provided.
+
+
 
 **Only non-polar solvation energy with energy decomposition**
 
 ::
 
-    g_mmpbsa run -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -nomme -pbsa -decomp -apol apolar.xvg -apcon contrib_apol.dat
+    g_mmpbsa run -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx \
+                 -unit1 Protein -unit2 Ligand -nomme -pbsa -decomp \
+                 -apol apolar.xvg -apcon contrib_apol.dat
+
+``apolar.xvg`` is the output file for non-polar-solvation energy and ``contrib_apol.dat`` is the output file for energy decomposition.
 
 *   An example `mmpbsa.mdp <https://github.com/rjdkmr/g_mmpbsa/blob/master/test/sasa_orig/mmpbsa.mdp>`_ file is provided for SASA only model.
 *   An example `mmpbsa.mdp <https://github.com/rjdkmr/g_mmpbsa/blob/master/test/sav_orig/mmpbsa.mdp>`_ file is provided for SAV only model.
@@ -64,5 +80,5 @@ To control the usage of processors/cores, number of threads can be changed by de
 
     export OMP_NUM_THREADS=X
 
-where `X` is number of core/processors.
+where ``X`` is number of core/processors.
 

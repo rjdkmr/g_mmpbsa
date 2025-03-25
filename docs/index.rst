@@ -49,8 +49,10 @@ Please always cite following three publications
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: Contents
 
-      Download and Installation <install>
-      Getting started with MM/PBSA calculation <quick-run>
+      Download and Installation <install.rst>
+      Getting started with MM/PBSA calculation <quick-run.rst>
+      g_mmpbsa commands <commands/index>
+      Input Solvation Energy Parameters <parameters/index>
 

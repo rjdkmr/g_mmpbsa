@@ -31,3 +31,16 @@ Use following steps to install gmx_clusterByFeatrues:
 
     sudo python3 -m pip install g-mmpbsa
 
+Installation from source code
+-----------------------------
+
+Conda can be used to install ``g_mmpbsa`` from source code. Please follow the steps below:
+
+.. code-block:: bash
+
+    # Clone the repository and setup development environment
+    git clone --recursive https://github.com/rjdkmr/g_mmpbsa.git
+    cd g_mmpbsa
+    conda env create -y --prefix ./venv --file environment.yaml # Create development conda environment
+    conda activate ./venv # Activate the environment
+    bash -i scripts/build_in_conda.sh # all build and setup steps are in this script

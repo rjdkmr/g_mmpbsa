@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CWD=$(pwd)
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
 
 cd external
 if [ -d apbs_installed ]; then
@@ -10,9 +11,13 @@ if [ -d gmx_installed ]; then
     rm -rf gmx_installed
 fi
 
+# Directory set-up where GROMACS and APBS will be installed
 mkdir apbs_installed
 mkdir gmx_installed
+export APBS_INSTALL=${CWD}/external/apbs_installed
+export GMX_INSTALL=${CWD}/external/gmx_installed
 
+# Build and Install APBS
 cd apbs/
 if [ -d build ]; then
     rm -rf build
@@ -26,7 +31,7 @@ cmake .. \
   -DAPBS_STATIC_BUILD=OFF  \
   -DBUILD_TOOLS=OFF \
   -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_INSTALL_PREFIX=/io/external/apbs_installed \
+  -DCMAKE_INSTALL_PREFIX=${APBS_INSTALL} \
   -DENABLE_PYGBE=OFF \
   -DENABLE_BEM=OFF \
   -DENABLE_iAPBS=ON \
@@ -40,9 +45,10 @@ cmake .. \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive"
 
-make -j12
+make
 make install
 
+# Build and Install GROMACS
 cd ${CWD}/external/gromacs
 if [ -d build ]; then
     rm -rf build
@@ -55,5 +61,9 @@ export GMX_SRC=${CWD}/external/gromacs
 cmake .. -DGMX_SIMD=NONE -DGMX_GPU=off -DGMXAPI=OFF -DGMX_INSTALL_LEGACY_API=on \
              -DGMX_FFT_LIBRARY=fftpack -DCMAKE_INSTALL_PREFIX=${GMX_PATH}
             
-make -j12
+make
 make install
+
+# Build and install the package
+cd ${CWD}
+GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} APBS_INSTALL=${APBS_INSTALL} python -m pip install -v .

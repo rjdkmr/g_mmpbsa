@@ -124,6 +124,9 @@ def extract_gromacs_flags():
             if 'lib' in entry:
                 lib_dir = entry
                 break
+        if lib_dir is None:
+            raise LookupError(f'GROMACS lib directory not found in "{gmx_install}"...')
+        
         os.environ['PKG_CONFIG_PATH'] = os.path.join(gmx_install, lib_dir, 'pkgconfig')
         gromacs_flags = check_gromacs_dirs()
     if gromacs_flags is None:
