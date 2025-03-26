@@ -33,3 +33,5 @@ g_mmpbsa commands
 
    run <run.rst>
    apbs <apbs.rst>
+   energy2bfac <energy2bfac.rst>
+   average <average.rst>
