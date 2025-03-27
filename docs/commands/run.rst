@@ -1,10 +1,10 @@
-g_mmpbsa run
-=============
+``g_mmpbsa run``
+=================
 
-``g_mmpbsa run`` calculates binding energy of biomolecular associations like protein-protein, 
+``g_mmpbsa run`` calculates binding energy of bio-molecular associations like protein-protein, 
 protein-ligand protein-DNA etc using MM/PBSA. It gives the different component of energy 
-term in separate file so that user will have choice to have either MM, PB and SA energy 
-values or all energies according to their objective. The tool also gives residue wise 
+term in separate file so that user will have choice to calculate either MM, PB and SA energy 
+values or all energy terms according to their objectives. The tool also gives residue wise 
 contribution to total binding energy which will provide information about important 
 contributing residues to the molecular association.
 
@@ -235,8 +235,8 @@ Input parameter file for polar and non-polar solvation energy.
 For more details about accepted keywords and options,
 follow these two links:
 
-* `Polar-Solvation Parameters <../parameters/polar.rst>`_
-* `Non-polar Solvation Keywords <../parameters/apolar.rst>`_
+* `Polar-Solvation Parameters <../parameters/polar-parameters.html>`_
+* `Non-polar Solvation Parameters <../parameters/non-polar-parameters.html>`_
 
 
 ``-ipdb input.pdb``
@@ -304,9 +304,43 @@ Final binding energy and its components frame wise.
 
 ``-os energy_summary.csv``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Summary of all energy terms as average and standard deviation.
+Summary of all energy terms as average and standard deviation. These files can be opened by MS Excel 
+or any other software supporting CSV file.
+
+The output file has following rows and columns:
+
+::
+
+  "Energy"             , "Average", "Standard-Deviation", 
+  "vDW"                , -334.587 ,               15.897, 
+  "Electrostatic"      , -318.759 ,               32.401, 
+  "Polar-solvation"    , 313.703  ,               10.426, 
+  "Non-polar-solvation", -30.420  ,                1.016, 
+  "Total"              , -370.062 ,               32.903,
+
+
 
 ``-ores residues_energy_summary.csv``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Summary of binding energy contributions (both average and standard deviation) 
-of residues over all frames.
+of residues over all frames. These files can be opened by MS Excel or any other software
+supporting CSV file.
+
+The output file has following rows and columns:
+
+::
+
+    "Resdiue", "vDW"   , "vdW-stddev", "Elec." , "Elec.-stdev", "polar", "polar-stdev", "apolar", "apolar-stdev", "total" , "total-stdev", 
+    "PRO-1"  , -0.004  ,        0.001, 0.655   ,         0.660, -0.202 ,         0.186, 0.000   ,          0.000, 0.449   ,         0.520, 
+    "GLN-2"  , -0.005  ,        0.000, 0.094   ,         0.074, -0.112 ,         0.060, 0.000   ,          0.000, -0.023  ,         0.032, 
+    "ILE-3"  , -0.018  ,        0.003, -0.083  ,         0.035, 0.101  ,         0.025, 0.000   ,          0.000, -0.000  ,         0.029, 
+    "THR-4"  , -0.014  ,        0.001, -0.013  ,         0.073, 0.004  ,         0.044, 0.000   ,          0.000, -0.022  ,         0.062, 
+    "LEU-5"  , -0.078  ,        0.009, 0.169   ,         0.061, -0.015 ,         0.056, 0.000   ,          0.000, 0.076   ,         0.055, 
+    "TRP-6"  , -0.039  ,        0.005, 0.164   ,         0.056, 0.009  ,         0.025, 0.000   ,          0.000, 0.134   ,         0.052, 
+    "GLN-7"  , -0.068  ,        0.014, -0.211  ,         0.152, 0.238  ,         0.086, 0.000   ,          0.000, -0.040  ,         0.132, 
+    "ARG-8"  , -5.167  ,        1.695, -3.454  ,         4.016, 9.184  ,         4.154, -0.637  ,          0.191, -0.074  ,         3.831, 
+    "PRO-9"  , -0.202  ,        0.041, -0.029  ,         0.120, 0.076  ,         0.072, 0.000   ,          0.000, -0.155  ,         0.122, 
+    "LEU-10" , -0.196  ,        0.057, -0.046  ,         0.061, 0.034  ,         0.027, 0.000   ,          0.000, -0.208  ,         0.077, 
+    .
+    .
+    .

@@ -3,8 +3,8 @@
    <a href="https://apbs.readthedocs.io/en/latest/using/index.html#command-line-use" target="_blank">APBS Homepage</a>
 
 
-apbs
-====
+``g_mmpbsa apbs``
+=================
 
 Please visit the |APBS| for more information about the command-line options of APBS.
 

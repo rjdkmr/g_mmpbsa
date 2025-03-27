@@ -55,4 +55,5 @@ Please always cite following three publications
       Getting started with MM/PBSA calculation <quick-run.rst>
       g_mmpbsa commands <commands/index>
       Solvation Energy Parameters <parameters/index>
+      Tutorials <tutorials/index>
 

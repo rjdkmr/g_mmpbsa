@@ -1,5 +1,5 @@
-``energy2bfac``
-================
+``g_mmpbsa energy2bfac``
+=========================
 
 This tool maps the binding energy contribution of each residue on the structure.
 The energy will be written in the B-factor field of the output PDB file/s.

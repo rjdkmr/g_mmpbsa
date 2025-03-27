@@ -185,7 +185,7 @@ def PlotCorr(c,args,fname):
 class Complex(object):
 	def __init__(self,MmFile,PolFile,APolFile,K):
 		self.TotalEn = []
-		self.Vdw, self.Elec, self.Pol, self.Sas, self.Sav, self.Wca =[], [], [], [], [], []
+		self.Vdw, self.Elec, self.Pol, self.Sas, self.Sav =[], [], [], [], []
 		self.MmFile = MmFile
 		self.PolFile = PolFile
 		self.APolFile = APolFile
@@ -201,7 +201,7 @@ class Complex(object):
 		apolEn = ReadData(self.APolFile,n=10)
 		CheckEnData(mmEn,polEn,apolEn)
 
-		time, MM, Vdw, Elec, Pol, Apol, Sas, Sav, Wca = [], [], [], [], [], [], [], [], []
+		time, MM, Vdw, Elec, Pol, Apol, Sas, Sav = [], [], [], [], [], [], [], []
 		for i in range(len(mmEn[0])):
 			#Vacuum MM
 			Energy = mmEn[5][i] + mmEn[6][i] - (mmEn[1][i] + mmEn[2][i] + mmEn[3][i] + mmEn[4][i])
@@ -214,14 +214,12 @@ class Complex(object):
 			Energy = polEn[3][i] - (polEn[1][i] + polEn[2][i])
 			Pol.append(Energy)
 			#Non-polar
-			Energy = apolEn[3][i] + apolEn[6][i] + apolEn[9][i] - (apolEn[1][i] + apolEn[2][i] + apolEn[4][i] + apolEn[5][i] + apolEn[7][i] + apolEn[8][i])
+			Energy = apolEn[3][i] + apolEn[6][i] - (apolEn[1][i] + apolEn[2][i] + apolEn[4][i] + apolEn[5][i])
 			Apol.append(Energy)
 			Energy = apolEn[3][i] - (apolEn[1][i] + apolEn[2][i])
 			Sas.append(Energy)
 			Energy = apolEn[6][i] - (apolEn[4][i] + apolEn[5][i])
 			Sav.append(Energy)
-			Energy = apolEn[9][i] - (apolEn[7][i] + apolEn[8][i])
-			Wca.append(Energy)
 			#Final Energy
 			time.append(mmEn[0][i])
 			Energy = MM[i] + Pol[i] + Apol[i]
@@ -230,9 +228,9 @@ class Complex(object):
 		# Writing frame wise component energy to file
 		frame_wise.write('\n#Complex %d\n' % ( (idx+1)))
 		for i in range(len(time)):
-			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf %15.3lf' % (time[i], mmEn[1][i], mmEn[2][i], polEn[1][i], (apolEn[1][i] + apolEn[4][i] + apolEn[7][i])))
-			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf'         %          (mmEn[3][i], mmEn[4][i], polEn[2][i], (apolEn[2][i] + apolEn[5][i] + apolEn[8][i])))
-			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf'         %          (mmEn[5][i], mmEn[6][i], polEn[3][i], (apolEn[3][i] + apolEn[6][i] + apolEn[9][i])))
+			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf %15.3lf' % (time[i], mmEn[1][i], mmEn[2][i], polEn[1][i], (apolEn[1][i] + apolEn[4][i])))
+			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf'         %          (mmEn[3][i], mmEn[4][i], polEn[2][i], (apolEn[2][i] + apolEn[5][i])))
+			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf'         %          (mmEn[5][i], mmEn[6][i], polEn[3][i], (apolEn[3][i] + apolEn[6][i])))
 			frame_wise.write('%15.3lf %15.3lf %15.3lf %15.3lf\n'         % (MM[i], Pol[i], Apol[i], self.TotalEn[i]))
 
 		#Bootstrap analysis energy components
@@ -253,9 +251,6 @@ class Complex(object):
 			avg_energy, error = BootStrap(Sav,bsteps)
 			self.Sav.append(avg_energy)
 			self.Sav.append(error)
-			avg_energy, error = BootStrap(Wca,bsteps)
-			self.Wca.append(avg_energy)
-			self.Wca.append(error)
 			#Bootstrap => Final Average Energy
 			self.AvgEnBS, AvgEn, EnErr, CI = ComplexBootStrap(self.TotalEn,bsteps)
 			self.FinalAvgEnergy = AvgEn
@@ -273,8 +268,6 @@ class Complex(object):
 			self.Sas.append(np.std(Sas))
 			self.Sav.append(np.mean(Sav))
 			self.Sav.append(np.std(Sav))
-			self.Wca.append(np.mean(Wca))
-			self.Wca.append(np.std(Wca))
 			self.FinalAvgEnergy = np.mean(self.TotalEn)
 			self.StdErr = np.std(self.TotalEn)
 
@@ -300,7 +293,6 @@ def Summary_Output_File(AllComplex,args):
 		fs.write('\n Polar solvation energy   = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Pol[0], AllComplex[n].Pol[1]))
 		fs.write('\n SASA energy              = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Sas[0], AllComplex[n].Sas[1]))
 		fs.write('\n SAV energy               = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Sav[0], AllComplex[n].Sav[1]))
-		fs.write('\n WCA energy               = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Wca[0], AllComplex[n].Wca[1]))
 		fs.write('\n Binding energy           = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].FinalAvgEnergy, AllComplex[n].StdErr))
 		fs.write('\n===============\n    END     \n===============\n\n')
 

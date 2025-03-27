@@ -44,7 +44,7 @@ import numpy as np
 import argparse
 import sys
 import os
-import math
+import csv
 
 def main():
 	args = ParseOptions()
@@ -76,6 +76,18 @@ def main():
 			fout.write("%-8s  %4.4f  %4.4f    %4.4f  %4.4f    %4.4f  %4.4f    %4.4f  %4.4f \n" % (resname[i],Residues[i].FinalMM[0],Residues[i].FinalMM[1], Residues[i].FinalPol[0], Residues[i].FinalPol[1], Residues[i].FinalAPol[0], Residues[i].FinalAPol[1], Residues[i].TotalEn[0],Residues[i].TotalEn[1] ))
 
 		fmap.write("%-8d     %4.4f \n" %((i+1), Residues[i].TotalEn[0]))
+	fout.close()
+
+	try:
+		fout = open(args.outputCSV,'w')
+	except:
+		raise IOError ('Could not open file {0} for writing. \n' .format(args.outputCSV))
+	
+	writer = csv.writer(fout)
+	writer.writerow(['Residues','MM Energy','MM Error','Polar Energy','Polar Error','APolar Energy','APolar Error','Total Energy','Total Error'])
+	for i, res in enumerate(Residues):
+		writer.writerow([resname[i],res.FinalMM[0],res.FinalMM[1],res.FinalPol[0],res.FinalPol[1],res.FinalAPol[0],res.FinalAPol[1],res.TotalEn[0],res.TotalEn[1]])
+	fout.close()
 
 
 class Residue(object):
@@ -130,8 +142,9 @@ def ParseOptions():
 	parser.add_argument("-a", "--apolar", help='Non-Polar solvation energy file',action="store",default='contrib_apol.dat',metavar='contrib_apol.dat')
 	parser.add_argument("-bs", "--bootstrap", help='Switch for Error by Boot Strap analysis',action="store_true")
 	parser.add_argument("-nbs", "--nbstep", help='Number of boot strap steps',action="store", type=int,default=500, metavar=500)
-	parser.add_argument("-ct", "--cutoff", help='Absolute Cutoff: energy output above and below this value',action="store",type=float,default=999, metavar=999)
+	parser.add_argument("-ct", "--cutoff", help='Absolute Cutoff: filter out all residues with -cutoff to +cutoff',action="store",type=float,default=999, metavar=999)
 	parser.add_argument("-o", "--output", help='Final Decomposed Energy File',action="store",default='final_contrib_energy.dat', metavar='final_contrib_energy.dat')
+	parser.add_argument("-ocsv", "--outputCSV", help='Final Decomposed Energy File im CSV format',action="store",default='final_contrib_energy.csv', metavar='final_contrib_energy.csv')
 	parser.add_argument("-om", "--outmap", help='energy2bfac input file: to map energy on structure for visualization',action="store",default='energyMapIn.dat', metavar='energyMapIn.dat')
 
 	if len(sys.argv) < 2:

@@ -9,22 +9,22 @@ g_mmpbsa commands
     * - Command
       - Function
 
-    * - `run <commands/cluster.html>`_
+    * - `run <run.html>`_
       - Run MM/PBSA calculation using trajectory and tpr file.
 
-    * - `apbs <commands/apbs.html>`_
+    * - `apbs <apbs.html>`_
       - apbs program used in PB calculation.
       
-    * - `energy2bfac <commands/distmat.html>`_
+    * - `energy2bfac <energy2bfac.html>`_
       - Generate PDB file where decomposed binding energy is written in B-factor column.
 
-    * - `average <commands/matplot.html>`_
+    * - `average <average.html>`_
       - Calculate final average binding energy including all energy terms. Supports multiple complexes at once.
       
-    * - `correlation <commands/hole.html>`_
+    * - `correlation <correlation.html>`_
       - Same as average, but also calculates correlation between predicted and experimental binding energies.
       
-    * - `decompose <commands/holeplot.html>`_
+    * - `decompose <decompose.html>`_
       - Calculate final average decomposed energies of residues with plots.
     
 .. toctree::
@@ -35,3 +35,5 @@ g_mmpbsa commands
    apbs <apbs.rst>
    energy2bfac <energy2bfac.rst>
    average <average.rst>
+   correlation <correlation.rst>
+   decompose <decompose.rst>

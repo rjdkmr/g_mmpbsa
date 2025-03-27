@@ -1,17 +1,18 @@
 ``g_mmpbsa average``
 ====================
 
-This script calculates the average binding energy and its standard deviation/error from the output files, which are obtained from g_mmpbsa.
+This command calculates the average binding energy and its standard deviation/error from the output files,
+which are obtained from ``g_mmpbsa run`` command.
 
 Command summary
 ---------------
 
 .. code-block:: bash
 
-    g_mmpbsa average [-h] [-mt] [-mf metafile.dat] [-m energy_MM.xvg]
-                     [-p polar.xvg] [-a apolar.xvg] [-bs] [-nbs 500]
-                     [-of full_energy.dat] [-os summary_energy.dat]
-                     [-om meta_energy.dat]
+    g_mmpbsa average [-h] [-mt] [-mf metafile.dat] [-m energy_MM.xvg] [-p polar.xvg]
+                     [-a apolar.xvg] [-bs] [-nbs 500] [-of full_energy.dat] 
+                     [-os summary_energy.dat] [-om meta_energy.dat]
+                     [-ocsv summary_energy.csv]
 
 
 
@@ -92,3 +93,10 @@ Final Energy File: Summary of energy components.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Final Energy File for Multiple Complexes: Complex wise net binding energy.
+
+-----
+
+``-ocsv summary_energy.csv, --outcsv summary_energy.csv``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Final Energy File in CSV formate: Full Summary of energy components in CSV format.
