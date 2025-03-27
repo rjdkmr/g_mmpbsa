@@ -8,7 +8,8 @@ Binding energy calculation
 Download Tutorial Package 
 --------------------------
 
-To download the tutorial package, click on this [**link**](tutorial.tar.gz). This package contains required file for the tutorial.
+To download the tutorial package, click on this `link <https://raw.githubusercontent.com/rjdkmr/g_mmpbsa/master/test/tutorial.tar.gz>`_.
+This package contains required file for the tutorial.
 
 Untar this package by following command: 
 
