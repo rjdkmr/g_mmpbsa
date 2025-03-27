@@ -124,9 +124,11 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
 
   #define NFILE asize(fnm)
   //To show the option on the screen and to take the all option
-  parse_common_args(&argc, argv,
+  if (!parse_common_args(&argc, argv,
       PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT , NFILE, fnm,
-      0, NULL, asize(desc), desc, 0, NULL, &oenv);
+      0, NULL, asize(desc), desc, 0, NULL, &oenv)) {
+        return 0;
+    };
 
   read_tps_conf(ftp2fn(efTPS, NFILE, fnm), &top, &ePBC, &xtop, NULL, box, FALSE);
   atoms = &(top.atoms);
