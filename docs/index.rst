@@ -32,7 +32,7 @@ The tool calculates components of binding energy using MM-PBSA method except the
 
 The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.
 
-Kindly post problems and queries in **|g_mmpbsa forum|**, we will try our best to provide the solution.
+Please **post problems and queries** in |g_mmpbsa forum|, we will try our best to provide the solution.
 
 
 ----
