@@ -25,7 +25,7 @@
 
 .. |g_mmpbsa documentation| raw:: html
 
-   <a href="http://rashmikumari.github.io/g_mmpbsa/" target="_blank">g_mmpbsa homepage</a>
+   <a href="https://g-mmpbsa.readthedocs.io/" target="_blank">g_mmpbsa homepage</a>
 
 Introduction
 =============
