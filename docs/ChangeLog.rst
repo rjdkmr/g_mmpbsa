@@ -1,15 +1,18 @@
+Change log
+==========
+
 Version 3.0
-===========
-* `g_mmpbsa` is now a Python package containing different tools.
+------------
+* ``g_mmpbsa`` is now a Python package containing different tools.
 
-* It can be installed by pip command: `python -m pip install g-mmpbsa`.
+* It can be installed by pip command: ``python -m pip install g-mmpbsa``.
 
-* `apbs` is also included as sub-command in `g_mmpbsa`.
+* ``apbs`` is also included as sub-command in ``g_mmpbsa``.
 
-* Supports **GROMACS-2018+ versions**.
+* Supports any version above **GROMACS-2018+ versions**.
 
 Removed features from previous versions
----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *   Removed internal APBS linking, now APBS is included as a sub-command in the package.
 
@@ -19,7 +22,7 @@ Removed features from previous versions
 
 
 Version 2.0
-============
+-----------
 
 *   Supports **GROMACS 2021**  and all previous versions.
 
@@ -36,7 +39,7 @@ Version 2.0
 *   This tool can be modified and/or redistributed under terms of GNU public license.
 
 Version 1.6
-===========
+-----------
 
 1. Added support for Gromacs-5.0.x versions
 
@@ -53,7 +56,7 @@ Version 1.6
 
 
 Version 1.5
-===========
+-----------
 
 1. Added support for external APBS program. Now, g_mmpbsa could be used with MPIRUN and external APBS program for parallel computations on HPC.
 
@@ -69,7 +72,7 @@ Version 1.5
 
 
 Version 1.1
-===========
+------------
 
 1. Update for MM calculation. Now this calculation is very fast and does not require large memory.
 

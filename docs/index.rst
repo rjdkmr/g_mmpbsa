@@ -56,4 +56,5 @@ Please always cite following three publications
       g_mmpbsa commands <commands/index>
       Solvation Energy Parameters <parameters/index>
       Tutorials <tutorials/index>
+      Change log <ChangeLog.rst>
 
