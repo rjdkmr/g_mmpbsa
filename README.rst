@@ -31,10 +31,12 @@ Introduction
 =============
 
 g_mmpbsa is developed using two widely used open source software i.e. |GROMACS| and |APBS| and it has similar user interface like other GROMACS tools.
+It is now upgraded as Python package for easy installation and usage.
 
-The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme.
+g_mmpbsa contains several `sub-commands <https://g-mmpbsa.readthedocs.io/en/latest/commands/index.html>`_ to carry out binding energy calculation using MM/PBSA method and
+energetic contribution of each residue to the binding using energy decomposition scheme.
 
-The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.
+Now g_mmpbsa can be directly installed on linux using ``python -m pip install g-mmpbsa`` and it supports all GROMACS version above 2018+.
 
 Please **post problems and queries** in |g_mmpbsa forum|, we will try our best to provide the solution.
 

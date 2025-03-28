@@ -11,7 +11,7 @@ authors = [
     { name = "Rashmi Kumari"}
 ]
 license = { text = "GNU General Public License v3 (GPLv3)" }
-readme = "README.rst"
+readme = "README.md"
 keywords = ["Molecular Modeling", "Molecular Dynamics Simulations", "Computational Chemistry", "Computational Biophysics", "MM/PBSA"]
 dependencies = ['numpy>=1.6',  'scipy>=0.9', 'matplotlib>=1.1.0']
 classifiers = [
