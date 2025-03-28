@@ -23,6 +23,9 @@ if [ -d build ]; then
     rm -rf build
 fi
 
+# Patch APBS to remove OpenMP check for static build
+# sed -i -e 's/message(FATAL_ERROR "OpenMP cannot be used with a static build")//' CMakeLists.txt
+
 mkdir build && cd build
 
 cmake .. \
