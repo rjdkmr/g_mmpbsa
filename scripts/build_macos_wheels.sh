@@ -3,53 +3,17 @@ set -e -x
 
 CWD=`pwd`
 
-brew install gcc@14 libomp gsl fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
+brew install libomp gsl fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
 brew install brewsci/bio/apbs
-# brew link --force openblas libomp
 brew cleanup
 
 ls -lhrt /opt/homebrew/opt/apbs/
 ls -lhrt /opt/homebrew/opt/apbs/lib
 ls -lhrt /opt/homebrew/opt/apbs/include
+export APBS_INSTALL=/opt/homebrew/opt/apbs
 
 cd external
-mkdir apbs_installed
 mkdir gmx_installed
-mkdir fetk_installed
-
-#export CC=gcc-14
-#export CXX=g++-14
-#export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/opt/openblas/lib/pkgconfig"
-#export LDFLAGS="${LDFLAGS} -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/openblas/lib"
-#export CPPFLAGS="${CPPFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-#export CFLAGS="${CFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-#export CXXFLAGS="${CXXFLAGS} -fpermissive -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/openblas/include"
-
-cd apbs
-mkdir build && cd build
-
-cmake .. \
-  -DCMAKE_INSTALL_INCLUDEDIR="include" \
-  -DBUILD_DOC=OFF \
-  -DAPBS_STATIC_BUILD=OFF  \
-  -DBUILD_TOOLS=OFF \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=${APBS_INSTALL} \
-  -DENABLE_PYGBE=OFF \
-  -DENABLE_BEM=OFF \
-  -DENABLE_iAPBS=ON \
-  -DENABLE_GEOFLOW=OFF \
-  -DENABLE_OPENMP=OFF \
-  -DENABLE_PBAM=OFF \
-  -DENABLE_PBSAM=OFF \
-  -DENABLE_PYTHON=OFF \
-  -DENABLE_TESTS=OFF \
-  -DGET_NanoShaper=OFF \
-  -DFETK_VERSION="57195e55351e04ce6ee0ef56a143c996a9aee7e2" \
-  -DCMAKE_VERBOSE_MAKEFILE=ON
-
-make 
-make install
 
 cd $CWD/external/gromacs
 if [ -d build ]; then
@@ -60,9 +24,8 @@ mkdir build && cd build
 export GMX_INSTALL=${CWD}/external/gmx_installed
 export GMX_SRC=${CWD}/external/gromacs
 
-cmake .. -DCMAKE_CC_COMIPLER=gcc-14 -DCMAKE_CXX_COMIPLER=g++-14 \
-         -DGMX_SIMD=NONE -DGMX_GPU=off -DGMXAPI=OFF -DGMX_INSTALL_LEGACY_API=on \
-         -DGMX_FFT_LIBRARY=fftpack -DCMAKE_INSTALL_PREFIX=${GMX_INSTALL}
+cmake .. -DGMX_SIMD=NONE -DGMX_GPU=off -DGMXAPI=OFF -DGMX_INSTALL_LEGACY_API=on \
+         -DGMX_FFT_LIBRARY=fftpack -DCMAKE_INSTALL_PREFIX=${GMX_INSTALL} -DGMX_OPENMP=OFF
             
 make
 make install
