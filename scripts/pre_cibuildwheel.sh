@@ -58,7 +58,7 @@ cmake .. \
 make || exit 1
 make install
 
-ls -lhrt ${CWD}/external/apbs_installed/lib
+ls -lhrt ${CWD}/external/apbs_installed/lib64
 
 cd $CWD/external/gromacs
 if [ -d build ]; then
