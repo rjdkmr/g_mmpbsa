@@ -2,10 +2,8 @@
 #
 # This file is part of g_mmpbsa.
 #
-# Authors: Rashmi Kumari and Andrew Lynn
-# Contribution: Rajendra Kumar
-#
-# Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013-2021 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2022-2025 Rajendra Kumar and Rashmi Kumari
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

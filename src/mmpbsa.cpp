@@ -4,7 +4,7 @@
  * Authors: Rajendra Kumar, Rashmi Kumari and Andrew Lynn
  *
  * Copyright (C) 2013-2021 Rashmi Kumari and Andrew Lynn
- * Copyright (C) 2022- Rajendra Kumar and Rashmi Kumari
+ * Copyright (C) 2022-2025 Rajendra Kumar and Rashmi Kumari
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,6 @@ extern int nsc_dclm ( rvec *coords, real *radius, int nat, int  densit,
 
 /**
 * @brief Data structure to hold information about non-bonded interactions
-* @author Rashmi Kumari
 */
 typedef struct	{
     int nr_nb; /**< Number of non-bonded pairs excluding 1-2 and 1-3 pairs */
@@ -96,7 +95,6 @@ typedef struct	{
 
 /**
 * @brief Data structure to hold information about polar solvation energy calculations
-* @author Rashmi Kumari
 */
 typedef struct {
     real cfac;            /**< Factor by which molecular dimensions should expand to get a coarse grid dimensions */
@@ -146,7 +144,6 @@ typedef struct {
 /**
 * @brief index for radius values in 2D array
 * @ingroup PBSA_PREP
-* @author Rashmi Kumari
 */
 enum { eSASRAD, /**< For SASA model */
        eSAVRAD, /**< For SAV model */
@@ -155,7 +152,6 @@ enum { eSASRAD, /**< For SASA model */
 /**
 * @brief index for PB solver
 * @ingroup PBSA_INPUT
-* @author Rashmi Kumari
 */
 enum {eLPBE, /**< Linear solver */ eNPBE  /**< Non-linear solver */};
 static const char *PBsolver[] = { "lpbe", "npbe", NULL };
@@ -163,7 +159,6 @@ static const char *PBsolver[] = { "lpbe", "npbe", NULL };
 /**
 * @brief index of keywords to boundary condition keywords
 * @ingroup PBSA_INPUT
-* @author Rashmi Kumari
 */
 enum {ezero, esdh, emdh};
 static const char *bcfl_words[] = { "zero", "sdh", "mdh", NULL };
@@ -171,7 +166,6 @@ static const char *bcfl_words[] = { "zero", "sdh", "mdh", NULL };
 /**
 * @brief index of keywords to method for mapping the biomolecular point charges to the grid
 * @ingroup PBSA_INPUT
-* @author Rashmi Kumari
 */
 enum { espl2, espl4, emol, esmol};
 static const char *srfm_words[] = { "spl2", "spl4",  "mol", "smol", NULL};
@@ -296,7 +290,7 @@ void CopyRightMsg()
         "                                                                        \n"
         "                                                                        \n"
         "       Copyright (C) 2013 - 2021 Rashmi Kumari and Andrew Lynn          \n"
-        "       Copyright (C) 2022- Rajendra Kumar and Rashmi Kumari             \n"
+        "       Copyright (C) 2022-2025 Rajendra Kumar and Rashmi Kumar          \n"
         "                                                                        \n"
         "g_mmpbsa is free software: you can redistribute it and/or modify        \n"
         "it under the terms of the GNU General Public License as published by    \n"
