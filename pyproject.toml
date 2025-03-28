@@ -23,12 +23,13 @@ classifiers = [
     'Natural Language :: English',
     'Operating System :: MacOS',
     'Operating System :: POSIX :: Linux',
-    'Topic :: Scientific/Engineering :: Computational-Chemistry',
+    'Topic :: Scientific/Engineering :: Chemistry',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
 ]
 
 [project.urls]
-homepage = "https://rashmikumari.github.io/g_mmpbsa/"
-repository = "https://github.com/RashmiKumari/g_mmpbsa"
+homepage = "https://g-mmpbsa.readthedocs.io/"
+repository = "https://github.com/rjdkmr/g_mmpbsa/"
 
 [project.scripts]
 g_mmpbsa = "g_mmpbsa:main.main"
