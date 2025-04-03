@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 
-cd /io/external
+cd $CWD/external
 mkdir apbs_installed
 mkdir gmx_installed
 
@@ -11,12 +11,14 @@ if [ -d build ]; then
     rm -rf build
 fi
 
+sed -i -e 's/message(FATAL_ERROR "OpenMP cannot be used with a static build")//' CMakeLists.txt
+
 mkdir build && cd build
 
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
   -DBUILD_DOC=OFF \
-  -DAPBS_STATIC_BUILD=OFF  \
+  -DAPBS_STATIC_BUILD=ON  \
   -DBUILD_TOOLS=OFF \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_INSTALL_PREFIX=/io/external/apbs_installed \
@@ -31,12 +33,14 @@ cmake .. \
   -DENABLE_TESTS=OFF \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
-  -DCMAKE_C_FLAGS="-fpermissive"
+  -DCMAKE_C_FLAGS="-fpermissive" \
+  -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
-make -j12
+make -j12 || exit 1
 make install
 
-cd /io/external/gromacs
+cd $CWD/external/gromacs
 if [ -d build ]; then
     rm -rf build
 fi
