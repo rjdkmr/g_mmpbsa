@@ -86,7 +86,7 @@ def check_gromacs_dirs():
         else:
             out['ldflags'].append(flags)
  
-    if '-fopenmp' not in out['ldflags']:
+    if '-fopenmp' not in out['ldflags'] and has_flag(self.compiler, '-fopenmp'):
         out['ldflags'].append('-fopenmp')
 
     
@@ -159,6 +159,10 @@ def populate_apbs_flags():
         if 'libapbs_routines' in entry:
             libapbs_routines = os.path.join(apbs_lib_dir, entry)
             break
+
+    if libapbs_routines is None:
+        raise LookupError(f'libapbs_routines.so or libapbs_routines.a file not found in "{apbs_lib_dir}"...')
+    
     print("Found libapbs_routines: ", libapbs_routines)
 
     expected_libs = [
@@ -204,7 +208,7 @@ def populate_apbs_flags():
                 libs_flags.append(f'-L{path_to_lib}')
             
     if sys.platform == 'linux' and len(libs_flags) == 0:
-        process = subprocess.run(['ldd', os.path.join(apbs_install, apbs_lib_dir, 'libapbs.so')])
+        process = subprocess.run(['ldd', libapbs_routines])
         output = process.stdout.decode('utf-8')
         if process.returncode != 0:
             raise RuntimeError('Error while running ldd on libapbs.so. Please check if APBS is installed correctly.')
@@ -246,7 +250,6 @@ def get_extensions():
             ],
         include_dirs=[ get_pybind_include(), get_pybind_include(user=True), 
                       'src', ] + gromacs_flags['include'] + apbs_flags['include'],
-        extra_compile_args = ['-fopenmp'],
         library_dirs=gromacs_flags['lib_dirs'] + apbs_flags['lib_dirs'],
         libraries=gromacs_flags['libs'],
         runtime_library_dirs = gromacs_flags['lib_dirs']  + apbs_flags['lib_dirs'],
@@ -320,8 +323,6 @@ class BuildExt(build_ext):
             opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
         for ext in self.extensions:
             ext.extra_compile_args += opts
-            if sys.platform == 'linux':
-                ext.extra_link_args += ['-static-libstdc++']
 
         # Remove "-Wstrict-prototypes" flags
         customize_compiler(self.compiler)
