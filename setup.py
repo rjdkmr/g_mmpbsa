@@ -85,11 +85,7 @@ def check_gromacs_dirs():
             out['libs'].append(flags[2:])
         else:
             out['ldflags'].append(flags)
- 
-    if '-fopenmp' not in out['ldflags'] and has_flag(self.compiler, '-fopenmp'):
-        out['ldflags'].append('-fopenmp')
-
-    
+     
     return out
 
 def include_gromacs_source_headers():
@@ -173,7 +169,9 @@ def populate_apbs_flags():
         'libcamd', 
         'libcolamd',
         'libamd',
-        'libopenblas', 
+        'libopenblas',
+        'libopenblasp', 
+        'libsatlas',
         'libsuitesparseconfig',
         'libarpack',
         'libmetis',
@@ -208,12 +206,11 @@ def populate_apbs_flags():
                 libs_flags.append(f'-L{path_to_lib}')
             
     if sys.platform == 'linux' and len(libs_flags) == 0:
-        process = subprocess.run(['ldd', libapbs_routines])
-        output = process.stdout.decode('utf-8')
+        process = subprocess.run(['ldd', libapbs_routines], capture_output=True, universal_newlines=True)
         if process.returncode != 0:
             raise RuntimeError('Error while running ldd on libapbs.so. Please check if APBS is installed correctly.')
         for lib in expected_libs:
-            if lib in output:
+            if lib in process.stdout:
                 libs_flags.append(f'-l{lib[3:]}')  # Remove 'lib' prefix
 
 
@@ -297,9 +294,6 @@ class BuildExt(build_ext):
         'unix': [],
     }
 
-    if sys.platform == 'linux':
-        c_opts['unix'] += [ '-static-libstdc++'] # Got From https://github.com/pypa/manylinux/issues/118
-
     def build_extensions(self):
         # Check for -stdlib=libc++ on macos-clang
         if sys.platform == 'darwin':
@@ -312,6 +306,9 @@ class BuildExt(build_ext):
             elif has_flag(self.compiler, '-stdlib=libc++'):
                 self.c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
 
+        if sys.platform == 'linux':
+            self.c_opts['unix'] += [ '-static-libstdc++'] # Got From https://github.com/pypa/manylinux/issues/118
+
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
         if ct == 'unix':
@@ -323,6 +320,11 @@ class BuildExt(build_ext):
             opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
         for ext in self.extensions:
             ext.extra_compile_args += opts
+
+        if has_flag(self.compiler, '-fopenmp'):
+            for ext in self.extensions:
+                ext.extra_compile_args.append('-fopenmp')
+                ext.extra_link_args.append('-fopenmp')
 
         # Remove "-Wstrict-prototypes" flags
         customize_compiler(self.compiler)
