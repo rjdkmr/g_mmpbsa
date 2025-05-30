@@ -32,14 +32,14 @@ if [ -d build ]; then
 fi
 
 # Patch APBS to remove OpenMP check for static build
-sed -i -e 's/message(FATAL_ERROR "OpenMP cannot be used with a static build")//' CMakeLists.txt
+# sed -i -e 's/message(FATAL_ERROR "OpenMP cannot be used with a static build")//' CMakeLists.txt
 
 mkdir build && cd build
 
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
   -DBUILD_DOC=OFF \
-  -DAPBS_STATIC_BUILD=ON  \
+  -DAPBS_STATIC_BUILD=OFF  \
   -DBUILD_TOOLS=OFF \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_INSTALL_PREFIX=${CWD}/external/apbs_installed \
@@ -55,7 +55,6 @@ cmake .. \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive" \
-  -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
   -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 make || exit 1

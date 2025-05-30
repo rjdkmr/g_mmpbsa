@@ -5,6 +5,7 @@ CWD=$(pwd)
 cd $CWD/external
 mkdir apbs_installed
 mkdir gmx_installed
+export APBS_INSTALL=$CWD/external/apbs_installed
 
 cd apbs/
 if [ -d build ]; then
@@ -21,10 +22,10 @@ cmake .. \
   -DAPBS_STATIC_BUILD=ON  \
   -DBUILD_TOOLS=OFF \
   -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_INSTALL_PREFIX=/io/external/apbs_installed \
+  -DCMAKE_INSTALL_PREFIX=${APBS_INSTALL} \
   -DENABLE_PYGBE=OFF \
   -DENABLE_BEM=OFF \
-  -DENABLE_iAPBS=ON \
+  -DENABLE_iAPBS=OFF \
   -DENABLE_GEOFLOW=OFF \
   -DENABLE_OPENMP=ON \
   -DENABLE_PBAM=OFF \
@@ -35,9 +36,10 @@ cmake .. \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive" \
   -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DCMAKE_VERBOSE_MAKEFILE=ON \
 
-make -j12 || exit 1
+make > make.log 2>&1 || exit 1
 make install
 
 cd $CWD/external/gromacs
@@ -46,8 +48,8 @@ if [ -d build ]; then
 fi
 mkdir build && cd build
 
-export GMX_PATH=/io/external/gmx_installed
-export GMX_SRC=/io/external/gromacs
+export GMX_PATH=$CWD/external/gmx_installed
+export GMX_SRC=$CWD/external/gromacs
 
 cmake .. -DGMX_SIMD=NONE -DGMX_GPU=off -DGMXAPI=OFF -DGMX_INSTALL_LEGACY_API=on \
              -DGMX_FFT_LIBRARY=fftpack -DCMAKE_INSTALL_PREFIX=${GMX_PATH}

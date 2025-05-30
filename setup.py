@@ -38,6 +38,7 @@ from setuptools.extension import Library
 from setuptools.command.build_ext import build_ext, customize_compiler
 from setuptools.command.install import install
 from distutils.command.build import build
+import subprocess
 import sys
 import setuptools
 import os
@@ -143,28 +144,79 @@ def populate_apbs_flags():
         raise LookupError('APBS directory {0} not exist...'.format(apbs_install))
     
     # check lib64 or lib dir exit
-    lib_dir = None
+    apbs_lib_dir = None
     for entry in os.listdir(apbs_install):
         if 'lib' in entry:
-            lib_dir = entry
+            apbs_lib_dir = entry
             break
+
+    if apbs_lib_dir is None:
+        raise LookupError(f'APBS lib directory not found in "{apbs_install}"...')
+    
+    apbs_lib_dir = os.path.join(apbs_install, apbs_lib_dir)
+    libapbs_routines = None
+    for entry in os.listdir(apbs_lib_dir):
+        if 'libapbs_routines' in entry:
+            libapbs_routines = os.path.join(apbs_lib_dir, entry)
+            break
+    print("Found libapbs_routines: ", libapbs_routines)
+
+    expected_libs = [
+        'libumfpack',
+        'libspqr',
+        'libcholmod',
+        'libccolamd',
+        'libcamd', 
+        'libcolamd',
+        'libamd',
+        'libopenblas', 
+        'libsuitesparseconfig',
+        'libarpack',
+        'libmetis',
+        'libapbs_mg',
+        'libapbs_fem',
+        'libapbs_pmgc',
+        'libapbs_generic',
+        'libapbs_routines',
+        'libiapbs'
+        'libmc',
+        'libpunc',
+        'libmaloc',
+        'libvf2c',
+        'libcgcode',
+        'libsuperlu'
+        ]
+    
+    libs_flags = []
+    if 'CONDA_PREFIX' in os.environ:
+        conda_prefix = os.environ['CONDA_PREFIX']
+
+        for lib in expected_libs:
+            path_to_lib = None
+            if os.path.isfile(os.path.join(conda_prefix, 'lib', lib + '.so')):
+                path_to_lib = os.path.join(conda_prefix, 'lib', lib + '.so')
+            if os.path.isfile(os.path.join(conda_prefix, 'lib64', lib + '.so')):
+                path_to_lib = os.path.join(conda_prefix, 'lib64', lib + '.so')
+            if os.path.isfile(os.path.join(apbs_install, apbs_lib_dir, f'{lib}.so')):
+                path_to_lib = os.path.join(apbs_install, apbs_lib_dir, f'{lib}.so')
+
+            if path_to_lib is not None:
+                libs_flags.append(f'-L{path_to_lib}')
+            
+    if sys.platform == 'linux' and len(libs_flags) == 0:
+        process = subprocess.run(['ldd', os.path.join(apbs_install, apbs_lib_dir, 'libapbs.so')])
+        output = process.stdout.decode('utf-8')
+        if process.returncode != 0:
+            raise RuntimeError('Error while running ldd on libapbs.so. Please check if APBS is installed correctly.')
+        for lib in expected_libs:
+            if lib in output:
+                libs_flags.append(f'-l{lib[3:]}')  # Remove 'lib' prefix
+
 
     apbs_flags = dict()
     apbs_flags['include'] = [os.path.join(apbs_install, 'include')]
-    apbs_flags['lib_dirs'] = [os.path.join(apbs_install, lib_dir)]
-    apbs_flags['ldflags'] = [
-        '-lapbs_mg',
-        '-lapbs_fem',
-        '-lapbs_pmgc',
-        '-lapbs_generic',
-        '-lapbs_routines',
-        '-lmc',
-        '-lpunc',
-        '-lmaloc',
-        '-lvf2c',
-        '-lcgcode',
-        '-lsuperlu',
-    ]
+    apbs_flags['lib_dirs'] = [os.path.join(apbs_install, apbs_lib_dir)]
+    apbs_flags['ldflags'] = libs_flags
 
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
