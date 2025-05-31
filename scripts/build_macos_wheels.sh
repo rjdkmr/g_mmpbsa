@@ -36,7 +36,7 @@ if [ -d build ]; then
 fi
 
 sed -i -e 's/include\(ImportFETK\)//g' CMakeLists.txt
-sed -i -e 's/import_fetk\(\$\{FETK_VERSION\}\)//g' CMakeLists.txt
+sed -i -e 's/import\_fetk\(\$\{FETK_VERSION\}\)//g' CMakeLists.txt
 cat CMakeLists.txt
 
 mkdir build && cd build
