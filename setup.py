@@ -34,10 +34,7 @@
 
 # Always prefer setuptools over distutils
 from setuptools import setup, Extension, find_packages
-from setuptools.extension import Library
 from setuptools.command.build_ext import build_ext, customize_compiler
-from setuptools.command.install import install
-from distutils.command.build import build
 import subprocess
 import sys
 import setuptools
@@ -170,23 +167,22 @@ def populate_apbs_flags():
         'libcolamd',
         'libamd',
         'libopenblas',
-        'libopenblasp', 
-        # 'libsatlas',
+        'libopenblasp',
         'libsuitesparseconfig',
         'libarpack',
         'libmetis',
-        'libapbs_mg',
-        'libapbs_fem',
-        'libapbs_pmgc',
-        'libapbs_generic',
-        'libapbs_routines',
-        'libiapbs'
         'libmc',
         'libpunc',
         'libmaloc',
         'libvf2c',
         'libcgcode',
-        'libsuperlu'
+        'libsuperlu',
+        'libiapbs',
+        'libapbs_mg',
+        'libapbs_fem',
+        'libapbs_pmgc',
+        'libapbs_generic',
+        'libapbs_routines',
         ]
     
     libs_flags = []

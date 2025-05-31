@@ -39,6 +39,7 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: bash {project}/scripts/pre_cibuildwheel.sh
           CIBW_BEFORE_BUILD: python -m pip install -r {project}/dev-requirements.txt
           CIBW_ENVIRONMENT: GMX_INSTALL=/project/external/gmx_installed GMX_SRC=/project/external/gromacs APBS_INSTALL=/project/external/apbs_installed
+          CIBW_BUILD_VERBOSITY: 2
 
       - uses: actions/upload-artifact@v4
         with:
