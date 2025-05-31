@@ -185,7 +185,7 @@ int apbs(
  double realCenter[3] = {0., 0., 0.};
 
  /* Instructions: */
- char header[] = {"\n\n\
+ const char header[] = {"\n\n\
 ----------------------------------------------------------------------\n\
  APBS -- Adaptive Poisson-Boltzmann Solver\n\
  Version " PACKAGE_STRING "\n\

@@ -55,6 +55,7 @@ cmake .. \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive" \
+  -DCMAKE_CXX_FLAGS="-fpermissive" \
   -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 make || exit 1
