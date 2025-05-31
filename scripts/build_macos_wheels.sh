@@ -19,6 +19,7 @@ mkdir build && cd build
 cmake .. \
     -DCMAKE_INSTALL_PREFIX=${CWD}/external/fetk_installed \
     -DCMAKE_C_FLAGS="-Wno-error=implicit-int" \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DBLA_STATIC=OFF
 
 make || exit 1
