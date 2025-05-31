@@ -171,7 +171,7 @@ def populate_apbs_flags():
         'libamd',
         'libopenblas',
         'libopenblasp', 
-        'libsatlas',
+        # 'libsatlas',
         'libsuitesparseconfig',
         'libarpack',
         'libmetis',
@@ -209,6 +209,7 @@ def populate_apbs_flags():
         process = subprocess.run(['ldd', libapbs_routines], capture_output=True, universal_newlines=True)
         if process.returncode != 0:
             raise RuntimeError('Error while running ldd on libapbs.so. Please check if APBS is installed correctly.')
+        print("ldd output:", process.stdout)
         for lib in expected_libs:
             if lib in process.stdout:
                 libs_flags.append(f'-l{lib[3:]}')  # Remove 'lib' prefix
