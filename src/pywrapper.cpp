@@ -87,6 +87,10 @@
      std::function<void(std::vector<std::string>)> wrapped_apbs = [](std::vector<std::string>  argument_vector) { 
          wrapped_gmx_function(argument_vector, &apbs);
      };
+     m.def("apbs", wrapped_apbs, py::call_guard<py::gil_scoped_release>());
+     m.attr("internal_apbs_exist") = py::bool_(true); // APBS is included in this build
+    #else
+     m.attr("internal_apbs_exist") = py::bool_(false); // APBS is not included in this build
     #endif
      
      std::function<void(std::vector<std::string>)> wrapped_mmpbsa = [](std::vector<std::string>  argument_vector) { 
@@ -98,9 +102,6 @@
      };
      
      m.def("gmx_version", &gmx_version);
-     #ifdef APBS_INTERNAL
-     m.def("apbs", wrapped_apbs, py::call_guard<py::gil_scoped_release>());
-     #endif
      m.def("mmpbsa", wrapped_mmpbsa, py::call_guard<py::gil_scoped_release>());
      m.def("energy2bfac", wrapped_energy2bfac, py::call_guard<py::gil_scoped_release>());
  }

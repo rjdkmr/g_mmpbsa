@@ -12,11 +12,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - os: macos-13
+            python: 311
+            platform_id: macosx_x86_64
+            env:
+              MACOSX_DEPLOYMENT_TARGET: 13.0
           - os: macos-14
             python: 311
             platform_id: macosx_x86_64
             env:
               MACOSX_DEPLOYMENT_TARGET: 14.0
+          - os: macos-15
+            python: 311
+            platform_id: macosx_x86_64
+            env:
+              MACOSX_DEPLOYMENT_TARGET: 15.0
 
     steps:
       - uses: actions/checkout@v4
@@ -33,17 +43,86 @@ jobs:
 
       - name: Test Wheels
         run: |
-          for PYTHON in ${PYTHONS[@]}
+          PYVERS=("3.9" "3.10" "3.11" "3.12")
+          PYTHONS=()
+          for PYVER in ${PYVERS[@]}
           do
-            pyenv global $PYTHON
-            echo $(python --version)
-            python -c "import gmx_clusterByFeatures; print('=====\nTEST -- gmx_clusterByFeatures GROMACS version: ', gmx_clusterByFeatures.gmx_version, '\n=====')"
+              # Install the latest release of the specified Python version using pyenv.
+              PYVER="$(pyenv install --list | grep -E "^\\s*$PYVER" | sort -n -t. -k3 | tail -n1)"
+              pyenv global $PYVER
+              echo $(python --version)
+              python -c "import g_mmpbsa; print('=====\nTEST -- g_mmpbsa GROMACS version: ', g_mmpbsa.gmx_version, '\n=====')"
           done
           pyenv global system
-
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: fixed_wheels/*.whl
+
+  publish:
+    needs: build_wheels
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: pypi
+      url: https://pypi.org/p/g-mmpbsa
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-13
+            python: 311
+            platform_id: macosx_x86_64          
+          - os: macos-14
+            python: 311
+            platform_id: macosx_x86_64
+          - os: macos-15
+            python: 311
+            platform_id: macosx_x86_64
+
+    steps:
+      - name: Download wheel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+
+  test_pypi_wheels:
+    needs: publish
+    name: Test PyPI wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-13
+            python: 311
+            platform_id: macosx_x86_64     
+          - os: macos-14
+            python: 311
+            platform_id: macosx_x86_64
+          - os: macos-15
+            python: 311
+            platform_id: macosx_x86_64
+
+    steps:
+      - name: running tests
+        run: bash scripts/test_macos_wheels.sh
