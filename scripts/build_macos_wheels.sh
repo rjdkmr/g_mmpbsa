@@ -3,7 +3,7 @@ set -e -x
 
 CWD=`pwd`
 
-brew install fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack metis
+brew install fftw gettext pyenv libiconv boost suite-sparse cmake superlu metis lapack
 brew cleanup
 
 cd external
@@ -18,6 +18,7 @@ fi
 mkdir build && cd build
 export BUILD_SUPERLU=OFF
 export BLA_STATIC=OFF
+export BLA_VENDOR=Apple
 
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
@@ -40,7 +41,8 @@ cmake .. \
   -DCMAKE_C_FLAGS="-fpermissive" \
   -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
   -DBLA_STATIC=OFF \
-  -DBUILD_SUPERLU=OFF
+  -DBUILD_SUPERLU=OFF \
+  -DBLA_VENDOR=Apple
 
 make || exit 1
 make install
