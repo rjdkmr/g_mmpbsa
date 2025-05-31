@@ -173,9 +173,6 @@ static const char *srfm_words[] = { "spl2", "spl4",  "mol", "smol", NULL};
 enum {espl0 = 2};
 static const char *chgm_words[] = {"spl2", "spl4", "spl0", NULL};
 
-enum { sacc };
-static const char *APsrfm_words[] = { "sacc", NULL};
-
 enum { mg_auto, mg_para };
 static const char *mg_words[] = { "mg-auto", "mg-para", NULL};
 
@@ -1032,8 +1029,8 @@ void AnalysisMMPBSA::writeOutput()
                 fprintf(fResiduesEnergySummary_, "\"%s-%d\", ", * ( atoms_->resinfo[r].name ), atoms_->resinfo[r].nr);
 
                 // For four energy terms, write average and standard deviations
-                for (int n = 0 ; n < residuesEnergy.size(); n++)    { // over energy terms
-                    for (int frame = 0; frame < vdwResiduesEnergy_.size(); frame++) { // transpose - over frames
+                for (size_t n = 0 ; n < residuesEnergy.size(); n++)    { // over energy terms
+                    for (size_t frame = 0; frame < vdwResiduesEnergy_.size(); frame++) { // transpose - over frames
                         energy[frame] = residuesEnergy[n][frame][r];
                     }
                     calc_average_stdev(energy, &av, &stdev);
@@ -1041,7 +1038,7 @@ void AnalysisMMPBSA::writeOutput()
                 }
 
                 // total energy from each frame
-                for (int frame = 0; frame < vdwResiduesEnergy_.size(); frame++) { // transpose - over frames
+                for (size_t frame = 0; frame < vdwResiduesEnergy_.size(); frame++) { // transpose - over frames
                     energy[frame] = vdwResiduesEnergy_[frame][r] + elecResiduesEnergy_[frame][r] + polarResiduesEnergy_[frame][r] + apolarResiduesEnergy_[frame][r];
                 }
 
@@ -1080,11 +1077,11 @@ void AnalysisMMPBSA::finishAnalysis ( int nframes )
 void AnalysisMMPBSA::buildNonBondedPairList()
 {
 
-    int i, j=0, k,l, ii, jj;
+    int i, j=0, k, ii, jj;
     const int *index;
     bool *globalIndex;
     int isize=0, splitIndex=0;
-    gmx_bool bExclude=FALSE, bLJ14=FALSE;
+    gmx_bool bExclude=FALSE;
 
     paramNonBond_.nr_nb = 1;
     paramNonBond_.nr_14 = 1;
@@ -1128,7 +1125,6 @@ void AnalysisMMPBSA::buildNonBondedPairList()
             paramNonBond_.pair14[paramNonBond_.nr_14-1] = ( int* ) malloc ( 2*sizeof ( int ) );
             paramNonBond_.pair14[paramNonBond_.nr_14-1][0] = ii;
             paramNonBond_.pair14[paramNonBond_.nr_14-1][1] = jj;
-            bLJ14=TRUE;
 
             if ( bDIFF_ )	{
                 srenew ( paramNonBond_.bItsA14, paramNonBond_.nr_14 );
@@ -1158,7 +1154,7 @@ void AnalysisMMPBSA::buildNonBondedPairList()
         for ( j=0; j < i; j++ )	{
             bExclude=FALSE;
 
-            for ( l = 0; l < localtop_->excls[index[i]].size(); l++ ) {
+            for ( size_t l = 0; l < localtop_->excls[index[i]].size(); l++ ) {
                 if ( index[j] == localtop_->excls[index[i]][l] ) {
                     bExclude=TRUE;
                     break;
@@ -1200,17 +1196,16 @@ void AnalysisMMPBSA::buildNonBondedPairList()
 
 void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
 {
-    rvec dx;
     // real colmb_factor = 138.935485;
     real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
     int ntype = mtop_->ffparams.atnr;
-    int i, j, k, l, n;
+    int i;
     int nres = atoms_->nres;
 
     if ( bDIFF_ ) {
-        if ( EEnergyFrame_.size() != nres+3 )
+        if ( EEnergyFrame_.size() != (size_t) nres+3 )
             EEnergyFrame_.resize ( nres+3 );
-        if ( VdwEnergyFrame_.size() != nres+3 )
+        if ( VdwEnergyFrame_.size() != (size_t) nres+3 )
             VdwEnergyFrame_.resize ( nres+3 );
     }
 
@@ -1283,7 +1278,6 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
     #pragma omp parallel for default(shared) reduction(+:sumEE[:3]) reduction(+:sumVdw[:3]) reduction(+:EERes[:nres]) reduction(+:VdwRes[:nres])
     for ( i=0; i<paramNonBond_.nr_14; i++ ) {
         double c6, c12, rij;
-        int itypeA, itypeB;
         int atomA, atomB, resA, resB;
         double TempEE, TempVdw, ddcFactor = 1;
 
@@ -1334,26 +1328,25 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
         VdwEnergyFrame_[i] = sumVdw[i];
     }
         
-    if ( bDCOMP_ )
+    if ( bDCOMP_ ) {
         for ( i=0; i<nres; i++ ) {
             EEnergyFrame_[i+3] = EERes[i];
             VdwEnergyFrame_[i+3] = VdwRes[i];
         }
-
-
+    }
 }
 
 void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
 {
-    int i, j=0;
+    int i;
     // real colmb_factor = 138.935485;
     real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
     int ntype = mtop_->ffparams.atnr;
     int nres = atoms_->nres;
 
-    if ( EEnergyFrame_.size() != nres+3 )
+    if ( EEnergyFrame_.size() != (size_t) nres+3 )
         EEnergyFrame_.resize ( nres+3 );
-    if ( VdwEnergyFrame_.size() != nres+3 )
+    if ( VdwEnergyFrame_.size() != (size_t) nres+3 )
         VdwEnergyFrame_.resize ( nres+3 );
 
     std::fill ( EEnergyFrame_.begin(), EEnergyFrame_.end(), 0.0 );
@@ -1453,7 +1446,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
             plotm->setTitle ( "Vaccum MM Energy" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
-            for ( size_t i = 0; i < mmColumnCount; ++i ) {
+            for ( int i = 0; i < mmColumnCount; ++i ) {
                 plotm->appendLegend ( mmLegends[i] );
             }
             mmEnergyData_.addModule ( plotm );
@@ -1500,7 +1493,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
             plotm->setTitle ( "Apolar solvation energy" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
-            for ( size_t i = 0; i < apolrColumnCount; ++i ) {
+            for ( int i = 0; i < apolrColumnCount; ++i ) {
                 plotm->appendLegend ( apolarLegends[i] );
             }
             apolarEnergyData_.addModule ( plotm );
@@ -1541,7 +1534,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
             plotm->setTitle ( "Polar solvation energy" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
-            for ( size_t i = 0; i < polrColumnCount; ++i ) {
+            for ( int i = 0; i < polrColumnCount; ++i ) {
                 plotm->appendLegend ( polarLegends[i] );
             }
             polarEnergyData_.addModule ( plotm );
@@ -1572,7 +1565,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
             plotm->setTitle ( "Binding energy)" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
-            for ( size_t i = 0; i < columnCount; ++i ) {
+            for ( int i = 0; i < columnCount; ++i ) {
                 plotm->appendLegend ( legends[i] );
             }
             bindingEnergyData_.addModule ( plotm );
@@ -1643,7 +1636,7 @@ void AnalysisMMPBSA::readPBSAInputs()
         pbsaInputKwords_.savrad = get_ereal ( &inp, "savrad",    1.29,  wi );
     }
 
-    free(wi);
+    delete wi;
 }
 
 void AnalysisMMPBSA::assignRadius()
@@ -1966,19 +1959,6 @@ void AnalysisMMPBSA::makePQR ( rvec* x, int group )
 
 void AnalysisMMPBSA::executeAPBS ( int group )
 {
-    std::string apbsCommand;
-    const char *apbs_env = NULL;
-    FILE *fApbsOut;
-    char **data=NULL;
-    bool bID_A=FALSE, bID_B =FALSE, bWCA_end=FALSE;
-    int nlines, i;
-    int mol1_start = 0, mol2_start = 0;
-    int mol1_lastID = 0, mol2_lastID = 0;
-
-    double totEnergy1, totEnergy2;
-    double *atEnergy1=NULL, *atEnergy2=NULL;
-    int at_count = 0;
-
     /* Executing APBS command */
     if ( 0 != system ( apbsCommand_.c_str() ) )
         GMX_THROW ( InternalError ( "Failed to execute command: " + apbsCommand_ ) );
@@ -1986,7 +1966,7 @@ void AnalysisMMPBSA::executeAPBS ( int group )
     gmx::TextInputFile inputStream ( fnApbsOut_ );
     std::string line;
     std::vector<std::string> tempVector;
-    int id, atomIndex;
+    int id=0, atomIndex;
     while ( inputStream.readLine ( &line ) ) {
         line = gmx::stripString ( line );
         

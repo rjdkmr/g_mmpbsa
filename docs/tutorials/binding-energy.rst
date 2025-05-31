@@ -131,7 +131,7 @@ Execute the following command:
     
     g_mmpbsa run -f 1EBZ.xtc -s 1EBZ.tpr -n 1EBZ.ndx -i ../pbsa.mdp -pdie 2 -pbsa -decomp \
                  -unit1 Protein -unit2 BEC -os energy_summary.csv \
-                 -ores residues_energy_summary.csv
+                 -ores residues_energy_summary.csv -silent
 
 Here we are selecting ``Protein`` as unit-1 and ``BEC``, which is a ligand, as unit-2. The binding
 energy will be calculated between the protein and ligand.

@@ -250,7 +250,7 @@ int apbs(
  nanosystems: application to microtubules and the ribosome. Proc.\n\
  Natl. Acad. Sci. USA 98, 10037-10041 2001.\n\
  \n\n"};
- char *usage =
+ const char *usage =
 {"\n\n\
 ----------------------------------------------------------------------\n\
  This driver program calculates electrostatic potentials, energies,\n\

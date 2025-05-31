@@ -436,7 +436,8 @@ int make_unsp(int densit, int mode, int * num_dot, int cubus) {
   int  *work;
   real x, y, z;
 
-  if (xpunsp) free(xpunsp); if (ico_wk) free(ico_wk);
+  if (xpunsp) free(xpunsp);
+  if (ico_wk) free(ico_wk);
 
   k=1; if (mode < 0) { k=0; mode = -mode; }
   if (mode == UNSP_ICO_ARC)      { ndot = ico_dot_arc(densit); }
@@ -544,8 +545,7 @@ int nsc_dclm(rvec *coords, real *radius, int nat,
   int  nxbox, nybox, nzbox, nxy, nxyz;
   real xmin=0, ymin=0, zmin=0, xmax, ymax, zmax, ra2max, d, *pco;
   /* Added DvdS 2006-07-19 */
-  rvec  ddx,*x=NULL;
-  int   iat_xx,jat_xx;
+  int   iat_xx;
 
  ////////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM/////
   double *atom_vol=NULL;
