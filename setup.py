@@ -199,7 +199,7 @@ def populate_apbs_flags():
                 path_to_lib = os.path.join(apbs_install, apbs_lib_dir, f'{lib}.so')
 
             if path_to_lib is not None:
-                libs_flags.append(f'-L{path_to_lib}')
+                libs_flags.append(f'-l{lib[3:]}')
             
     if sys.platform == 'linux' and len(libs_flags) == 0:
         process = subprocess.run(['ldd', libapbs_routines], capture_output=True, universal_newlines=True)
@@ -209,6 +209,7 @@ def populate_apbs_flags():
         for lib in expected_libs:
             if lib in process.stdout:
                 libs_flags.append(f'-l{lib[3:]}')  # Remove 'lib' prefix
+        libs_flags.append('-lapbs_routines')
 
 
     apbs_flags = dict()
