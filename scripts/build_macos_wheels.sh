@@ -3,7 +3,7 @@ set -e -x
 
 CWD=`pwd`
 
-brew install fftw gettext pyenv libiconv boost suite-sparse cmake superlu metis lapack
+brew install fftw gettext pyenv libiconv boost suite-sparse cmake superlu metis lapack arpack
 brew cleanup
 
 cd external
