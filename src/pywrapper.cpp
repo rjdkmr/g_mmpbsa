@@ -48,7 +48,10 @@
  
  namespace py = pybind11;
  
+ #ifdef APBS_INTERNAL
  int apbs(int argc,char *argv[]);
+ #endif
+
  int mmpbsa(int argc,char *argv[]);
  int energy2bfac (int argc,char *argv[]);
  
@@ -80,9 +83,11 @@
  void wrap_gmx_programs(py::module &m) {
      register_ctrl_c_signal(); // register Ctrl+C for keyboard interruption
      
+    #ifdef APBS_INTERNAL
      std::function<void(std::vector<std::string>)> wrapped_apbs = [](std::vector<std::string>  argument_vector) { 
          wrapped_gmx_function(argument_vector, &apbs);
      };
+    #endif
      
      std::function<void(std::vector<std::string>)> wrapped_mmpbsa = [](std::vector<std::string>  argument_vector) { 
          wrapped_gmx_function(argument_vector, &mmpbsa);
@@ -93,7 +98,9 @@
      };
      
      m.def("gmx_version", &gmx_version);
+     #ifdef APBS_INTERNAL
      m.def("apbs", wrapped_apbs, py::call_guard<py::gil_scoped_release>());
+     #endif
      m.def("mmpbsa", wrapped_mmpbsa, py::call_guard<py::gil_scoped_release>());
      m.def("energy2bfac", wrapped_energy2bfac, py::call_guard<py::gil_scoped_release>());
  }

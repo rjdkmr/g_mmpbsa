@@ -130,8 +130,17 @@ def extract_gromacs_flags():
 
 def populate_apbs_flags():
     global apbs_flags
+    apbs_flags = dict()
+    apbs_flags['include'] = []
+    apbs_flags['lib_dirs'] = []
+    apbs_flags['ldflags'] = []
+
+    if sys.platform == 'darwin':
+        return
+    
     if not 'APBS_INSTALL' in os.environ:
         raise LookupError('APBS_INSTALL environment variable not found...')
+        
     apbs_install = os.environ['APBS_INSTALL']
     if not os.path.isdir(apbs_install):
         raise LookupError('APBS directory {0} not exist...'.format(apbs_install))
@@ -212,10 +221,9 @@ def populate_apbs_flags():
         libs_flags.append('-lapbs_routines')
 
 
-    apbs_flags = dict()
-    apbs_flags['include'] = [os.path.join(apbs_install, 'include')]
-    apbs_flags['lib_dirs'] = [os.path.join(apbs_install, apbs_lib_dir)]
-    apbs_flags['ldflags'] = libs_flags
+    apbs_flags['include'] += [os.path.join(apbs_install, 'include')]
+    apbs_flags['lib_dirs'] += [os.path.join(apbs_install, apbs_lib_dir)]
+    apbs_flags['ldflags'] += libs_flags
 
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
@@ -235,14 +243,14 @@ def get_extensions():
     '''Extensions that are need to be compiled
     '''
     global extensions
+    src_file_names = ['src/pywrapper.cpp', 'src/mmpbsa.cpp', 'src/energy2bfac.cpp', 'src/nsc.cpp']
+
+    if sys.platform == 'linux':
+        src_file_names.append('src/apbs.cpp')
+
     extensions = [ Extension(
         'g_mmpbsa.g_mmpbsa',
-        [   'src/pywrapper.cpp',
-            'src/apbs.cpp',
-            'src/mmpbsa.cpp',
-            'src/energy2bfac.cpp',
-            'src/nsc.cpp'
-            ],
+        src_file_names,
         include_dirs=[ get_pybind_include(), get_pybind_include(user=True), 
                       'src', ] + gromacs_flags['include'] + apbs_flags['include'],
         library_dirs=gromacs_flags['lib_dirs'] + apbs_flags['lib_dirs'],
@@ -306,6 +314,7 @@ class BuildExt(build_ext):
 
         if sys.platform == 'linux':
             self.c_opts['unix'] += [ '-static-libstdc++'] # Got From https://github.com/pypa/manylinux/issues/118
+            self.c_opts['unix'] += [ '-DAPBS_INTERNAL' ]
 
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
