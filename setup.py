@@ -40,6 +40,7 @@ import sys
 import setuptools
 import os
 import glob
+import sysconfig
 
 sys.path.append(os.path.dirname(__file__))
 here = os.path.abspath(os.path.dirname(__file__))
@@ -301,16 +302,17 @@ class BuildExt(build_ext):
     }
 
     def build_extensions(self):
+        
         # Check for -stdlib=libc++ on macos-clang
         if sys.platform == 'darwin':
-            # first check ""-stdlib=libstdc++" is available,
-            # if available means gcc is used in place of clang
-            if has_flag(self.compiler, '-stdlib=libstdc++'):
+            #check if compiler is clang or gcc
+            cc_var = sysconfig.get_config_var("CC")
+            if 'clang' in cc_var:
+                self.c_opts['unix'] += ['-stdlib=libc++']
+            elif 'g++' in cc_var or 'gcc' in cc_var:
                 self.c_opts['unix'] += ['-stdlib=libstdc++']
-                
-            # Only in case of clang, so check for this flag
-            elif has_flag(self.compiler, '-stdlib=libc++'):
-                self.c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
+            else:
+                raise RuntimeError('Unsupported compiler type: {0}'.format(cc_var))
 
         if sys.platform == 'linux':
             self.c_opts['unix'] += [ '-static-libstdc++'] # Got From https://github.com/pypa/manylinux/issues/118
