@@ -19,8 +19,7 @@ mkdir build && cd build
 cmake .. \
     -DCMAKE_INSTALL_PREFIX=${CWD}/external/fetk_installed \
     -DCMAKE_C_FLAGS="-Wno-error=implicit-int" \
-    -DBLA_STATIC=OFF \
-    -DBUILD_SUPERLU=OFF
+    -DFETK_STATIC_BUILD=OFF
 
 make || exit 1
 make install
