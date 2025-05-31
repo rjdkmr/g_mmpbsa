@@ -3,7 +3,7 @@ set -e -x
 
 CWD=`pwd`
 
-brew install fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
+brew install fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack metis
 brew cleanup
 
 cd external
@@ -16,6 +16,8 @@ if [ -d build ]; then
 fi
 
 mkdir build && cd build
+export BUILD_SUPERLU=OFF
+export BLA_STATIC=OFF
 
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
@@ -36,7 +38,9 @@ cmake .. \
   -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive" \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DBLA_STATIC=OFF \
+  -DBUILD_SUPERLU=OFF
 
 make || exit 1
 make install
