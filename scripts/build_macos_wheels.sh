@@ -19,6 +19,8 @@ mkdir build && cd build
 export BUILD_SUPERLU=OFF
 export BLA_STATIC=OFF
 export BLA_VENDOR=OpenBLAS
+export LDFLAGS="-L/opt/homebrew/opt/lapack/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/lapack/include"
 
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
