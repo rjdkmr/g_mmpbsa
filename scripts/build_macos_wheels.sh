@@ -3,17 +3,43 @@ set -e -x
 
 CWD=`pwd`
 
-brew install libomp gsl fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
-brew install brewsci/bio/apbs
+brew install fftw pyenv eigen boost suite-sparse openblas cmake superlu arpack
 brew cleanup
-
-ls -lhrt /opt/homebrew/opt/apbs/
-ls -lhrt /opt/homebrew/opt/apbs/lib
-ls -lhrt /opt/homebrew/opt/apbs/include
-export APBS_INSTALL=/opt/homebrew/opt/apbs
 
 cd external
 mkdir gmx_installed
+mkdir apbs_installed
+
+cd apbs/
+if [ -d build ]; then
+    rm -rf build
+fi
+
+mkdir build && cd build
+
+cmake .. \
+  -DCMAKE_INSTALL_INCLUDEDIR="include" \
+  -DBUILD_DOC=OFF \
+  -DAPBS_STATIC_BUILD=OFF  \
+  -DBUILD_TOOLS=OFF \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_INSTALL_PREFIX=${CWD}/external/apbs_installed \
+  -DENABLE_PYGBE=OFF \
+  -DENABLE_BEM=OFF \
+  -DENABLE_iAPBS=ON \
+  -DENABLE_GEOFLOW=OFF \
+  -DENABLE_OPENMP=OFF \
+  -DENABLE_PBAM=OFF \
+  -DENABLE_PBSAM=OFF \
+  -DENABLE_PYTHON=OFF \
+  -DENABLE_TESTS=OFF \
+  -DFETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2 \
+  -DGET_NanoShaper=OFF \
+  -DCMAKE_C_FLAGS="-fpermissive" \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+
+make || exit 1
+make install
 
 cd $CWD/external/gromacs
 if [ -d build ]; then
