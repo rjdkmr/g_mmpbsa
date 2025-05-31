@@ -1212,7 +1212,9 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
     std::fill ( EEnergyFrame_.begin(), EEnergyFrame_.end(), 0.0 );
     std::fill ( VdwEnergyFrame_.begin(), VdwEnergyFrame_.end(), 0.0 );
     
-    double EERes[nres] = {0}, VdwRes[nres] = {0};
+    double EERes[nres], VdwRes[nres];
+    memset( EERes, 0, nres*sizeof(double) );
+    memset( VdwRes, 0, nres*sizeof(double) );
     double sumEE[3] ={0}, sumVdw[3] = {0};
 
     // Energy of all previously listed atom-pairs except 1-2, 1-3 and 1-4 pairs  
@@ -1352,7 +1354,9 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
     std::fill ( EEnergyFrame_.begin(), EEnergyFrame_.end(), 0.0 );
     std::fill ( VdwEnergyFrame_.begin(), VdwEnergyFrame_.end(), 0.0 );
     
-    double EERes[nres] = {0}, VdwRes[nres] = {0};
+    double EERes[nres], VdwRes[nres];
+    memset( EERes, 0, nres*sizeof(double) );
+    memset( VdwRes, 0, nres*sizeof(double) );
     double sumEE =0, sumVdw = 0;
 
     #pragma omp parallel for default(shared) reduction(+:sumEE) reduction(+:sumVdw) reduction(+:EERes[:nres]) reduction(+:VdwRes[:nres])
