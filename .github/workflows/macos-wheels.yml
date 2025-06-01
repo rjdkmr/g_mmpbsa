@@ -38,7 +38,7 @@ jobs:
         with: 
           python-version: "3.11" # update once build dependencies are available
 
-      - name: Build and Test Wheels
+      - name: Build Wheels
         run: bash scripts/build_macos_wheels.sh
 
       - name: Upload Artifacts
