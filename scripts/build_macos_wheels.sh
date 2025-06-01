@@ -27,6 +27,8 @@ make install
 
 cd ${CWD}
 
+# build the wheels for each Python version
+mkdir wheelhouse
 eval "$(pyenv init -)"
 pyenv install --list
 PYVERS=("3.9" "3.10" "3.11" "3.12")
@@ -43,29 +45,30 @@ do
     python -m pip install --upgrade pip
     python -m pip install -r ${CWD}/dev-requirements.txt
     python -m pip install delocate
+
+    # install and build wheels
+    GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} python -m pip install -v --no-deps --no-cache-dir .
+    otool -L build/lib.*/g_mmpbsa/*.so
+    install_name_tool -change @rpath/libgromacs.2.dylib ${GMX_INSTALL}/lib/libgromacs.dylib build/lib.*/g_mmpbsa/*.so
+    GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} APBS_INSTALL=${APBS_INSTALL} python -m pip wheel -v -w wheelhouse/ --no-deps --no-cache-dir .
+    python -m pip uninstall -y g_mmpbsa
 done
 pyenv global system
 
-mkdir wheels
-mkdir fixed_wheels
+# repair the wheels
+mkdir fixed_wheelhouse
+delocate-listdeps wheelhouse/*.whl
+delocate-wheel -w fixed_wheelhouse -v wheelhouse/*.whl
+delocate-listdeps fixed_wheelhouse/*.whl
+
+# install from wheels and test the wheels
 for PYTHON in ${PYTHONS[@]}
 do
     pyenv global $PYTHON
     echo $(python --version)
-    GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} python -m pip install -v --no-deps --no-cache-dir .
-    otool -L build/lib.*/g_mmpbsa/*.so
-    install_name_tool -change @rpath/libgromacs.2.dylib ${GMX_INSTALL}/lib/libgromacs.dylib build/lib.*/g_mmpbsa/*.so
-    GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} APBS_INSTALL=${APBS_INSTALL} python -m pip wheel -v -w temp_wheels/ --no-deps --no-cache-dir .
-    python -m pip uninstall -y g_mmpbsa
-    python -m pip install -v --no-deps --no-cache-dir temp_wheels/*.whl
-    cp temp_wheels/*.whl wheels/.
-    rm -rf build
-    rm -rf temp_wheels
+    python -m pip install -v --no-deps --no-cache-dir fixed_wheelhouse/*.whl
+    python -c "import g_mmpbsa; print('=====\nTEST -- g_mmpbsa GROMACS version: ', g_mmpbsa.gmx_version, '\n=====')"
 done
-
-delocate-listdeps wheels/*.whl
-delocate-wheel -w fixed_wheels -v wheels/*.whl
-delocate-listdeps fixed_wheels/*.whl
 pyenv global system
 
-ls -lrt fixed_wheels/
+ls -lrt fixed_wheelhouse/

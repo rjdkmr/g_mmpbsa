@@ -38,22 +38,8 @@ jobs:
         with: 
           python-version: "3.11" # update once build dependencies are available
 
-      - name: Build Wheels
+      - name: Build and Test Wheels
         run: bash scripts/build_macos_wheels.sh
-
-      - name: Test Wheels
-        run: |
-          PYVERS=("3.9" "3.10" "3.11" "3.12")
-          PYTHONS=()
-          for PYVER in ${PYVERS[@]}
-          do
-              # Install the latest release of the specified Python version using pyenv.
-              PYVER="$(pyenv install --list | grep -E "^\\s*$PYVER" | sort -n -t. -k3 | tail -n1)"
-              pyenv global $PYVER
-              echo $(python --version)
-              python -c "import g_mmpbsa; print('=====\nTEST -- g_mmpbsa GROMACS version: ', g_mmpbsa.gmx_version, '\n=====')"
-          done
-          pyenv global system
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
