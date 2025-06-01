@@ -145,7 +145,7 @@ are generated.
 
 It will also calculate average binding energy and standard deviation of all the energy terms
 and will be output in **CSV format** ``energy_summary.csv`` file provided with ``-os`` option.
-This file can be dirctely opened in MS excel or any other spreadsheet software. 
+This file can be directly opened in MS excel or any other spreadsheet software. 
 
 ::
 
@@ -166,7 +166,7 @@ The output file has following rows and columns:
 
 ::
 
-    "Resdiue", "vDW"   , "vdW-stddev", "Elec." , "Elec.-stdev", "polar", "polar-stdev", "apolar", "apolar-stdev", "total" , "total-stdev", 
+    "Residue", "vDW"   , "vdW-stddev", "Elec." , "Elec.-stdev", "polar", "polar-stdev", "apolar", "apolar-stdev", "total" , "total-stdev", 
     "PRO-1"  , -0.004  ,        0.001, 0.655   ,         0.660, -0.202 ,         0.186, 0.000   ,          0.000, 0.449   ,         0.520, 
     "GLN-2"  , -0.005  ,        0.000, 0.094   ,         0.074, -0.112 ,         0.060, 0.000   ,          0.000, -0.023  ,         0.032, 
     "ILE-3"  , -0.018  ,        0.003, -0.083  ,         0.035, 0.101  ,         0.025, 0.000   ,          0.000, -0.000  ,         0.029, 
@@ -242,7 +242,7 @@ To calculate average binding energy by using bootstrap analysis, execute followi
 
     g_mmpbsa run -bs -nbs 2000 -m energy_MM.xvg -p polar.xvg -a apolar.xvg
 
-Again, two output files ``full_energy.dat`` and ``summary_energy.dat`` are genrated as outputs.
+Again, two output files ``full_energy.dat`` and ``summary_energy.dat`` are generated as outputs.
 ``full_energy.dat`` is similar to that of the above one.
 However, ``summary_energy.dat`` contains average and standard error of all energetic components 
 including the binding energy.  

@@ -14,6 +14,14 @@ contributing residues to the molecular association.
 
     g_mmpbsa run -h
 
+
+.. warning:: On MacOS, external APBS is required to run this command. 
+             If APBS is not installed, the command will fail with an error message.
+
+             * Use **Homebrew to install APBS** on MacOS (``brew install brewsci/bio/apbs``).
+             * Define APBS environment variable, e.g. ``export APBS=$(brew --prefix apbs)/bin/apbs``.
+
+
 Command summary 
 ----------------
 
@@ -330,7 +338,7 @@ The output file has following rows and columns:
 
 ::
 
-    "Resdiue", "vDW"   , "vdW-stddev", "Elec." , "Elec.-stdev", "polar", "polar-stdev", "apolar", "apolar-stdev", "total" , "total-stdev", 
+    "Residue", "vDW"   , "vdW-stddev", "Elec." , "Elec.-stdev", "polar", "polar-stdev", "apolar", "apolar-stdev", "total" , "total-stdev", 
     "PRO-1"  , -0.004  ,        0.001, 0.655   ,         0.660, -0.202 ,         0.186, 0.000   ,          0.000, 0.449   ,         0.520, 
     "GLN-2"  , -0.005  ,        0.000, 0.094   ,         0.074, -0.112 ,         0.060, 0.000   ,          0.000, -0.023  ,         0.032, 
     "ILE-3"  , -0.018  ,        0.003, -0.083  ,         0.035, 0.101  ,         0.025, 0.000   ,          0.000, -0.000  ,         0.029, 

@@ -13,7 +13,7 @@ g_mmpbsa commands
       - Run MM/PBSA calculation using trajectory and tpr file.
 
     * - `apbs <apbs.html>`_
-      - apbs program used in PB calculation.
+      - apbs program used in PB calculation. **Not available in MacOS.**
       
     * - `energy2bfac <energy2bfac.html>`_
       - Generate PDB file where decomposed binding energy is written in B-factor column.

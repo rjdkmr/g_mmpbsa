@@ -14,14 +14,20 @@ For more details about ``g_mmpbsa run`` command, visit `usage <commands/run.html
     g_mmpbsa run -h
 
 
+.. warning:: On MacOS, external APBS is required to run this command. 
+             If APBS is not installed, the command will fail with an error message.
+
+             * Use **Homebrew to install APBS** on MacOS (``brew install brewsci/bio/apbs``).
+             * Define APBS environment variable to point to the APBS executable, e.g. ``export APBS=$(brew --prefix apbs)/bin/apbs``.
+
+
 **Only molecular mechanics (vdw and electrostatic) vacuum energy with energy decomposition**
 
 ::
 
     g_mmpbsa run -f traj.xtc -s topol.tpr -n index.ndx -unit1 Protein -unit2 Ligand \
                  -mme -mm energy_MM.xvg -decomp -mmcon contrib_MM.dat
-     
-     
+          
 Here ``traj.xtc`` is the trajectory file, ``topol.tpr`` is the topology file,
 ``index.ndx`` is the index file, ``Protein`` and ``Ligand`` are the group names 
 of protein and ligand in the index file.
@@ -81,4 +87,7 @@ To control the usage of processors/cores, number of threads can be changed by de
     export OMP_NUM_THREADS=X
 
 where ``X`` is number of core/processors.
+
+.. warning:: **Not available on MacOS**.
+             APBS installed using Homebrew does not support OpenMP parallel computation on MacOS.
 

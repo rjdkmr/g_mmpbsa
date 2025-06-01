@@ -9,7 +9,11 @@ Version 3.0
 
 * ``apbs`` is also included as sub-command in ``g_mmpbsa``.
 
-* Supports any version above **GROMACS-2018+ versions**.
+* Supports any GROMACS version.
+
+* Also available on MacOS apart from Linux.
+  
+* Supports Python 3.9, 3.10, 3.11, 3.12 and 3.13.
 
 Removed features from previous versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -106,8 +106,8 @@ typedef struct {
     bool bFocus;      /**<  Whether focus type is enabled */
 
     int mg_type;          /**<  multi-grid calculation type */
-    ivec dime;            /**<  grid dimenstions */
-    ivec pdime;           /**<  grid dimenstions for parallel calculations */
+    ivec dime;            /**<  grid dimensions */
+    ivec pdime;           /**<  grid dimensions for parallel calculations */
     rvec cglen;           /**<  coarse grid lengths */
     rvec cgcent;          /**<  center of coarse-grid box */
     rvec fglen;           /**<  fine grid lengths */
@@ -124,7 +124,7 @@ typedef struct {
     real sdie;            /**<  Solvent dielectric constant */
     real vdie;            /**<  Vacuum or reference dielectric constant*/
     int srfm;             /**<  To construct the dielectric and ion-accessibility coefficients */
-    int chgm;             /**<  To map the biomolecular point charges to the grid */
+    int chgm;             /**<  To map the bio-molecular point charges to the grid */
     real sdens;           /**<  Number of grid points per Å^2 for constructing the molecular surface or solvent accessible surface */
     real srad;            /**<  Radius (in Å) of solvent molecules */
     real swin;            /**<  Value for cubic spline window for spline-based surface definitions */

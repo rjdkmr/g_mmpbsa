@@ -6,6 +6,8 @@
 ``g_mmpbsa apbs``
 =================
 
+.. warning:: This sub-command is **not available** in MacOS.
+
 Please visit the |APBS| for more information about the command-line options of APBS.
 
 .. note:: The included APBS contains only **minimal functionality**.

@@ -42,7 +42,7 @@ first and second group number, respectively. Now, load the PDB file in the VMD a
 
 Change graphical representation to ``NewCartoon`` in ``Drawing Method``.
 Change ``Coloring Method`` to ``Beta``. To get a color scale bar, go to 
-``Extension`` → ``Visulaization`` → ``Color Scale Bar``.
+``Extension`` → ``Visualization`` → ``Color Scale Bar``.
 Choose ``Autoscale: On``. Chose ``Label format: Decimal``.
 Then, click on ``Color Scale Bar``.
 
