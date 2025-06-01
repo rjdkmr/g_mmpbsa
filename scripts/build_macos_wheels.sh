@@ -49,9 +49,10 @@ do
     # install and build wheels
     GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} python -m pip install -v --no-deps --no-cache-dir .
     otool -L build/lib.*/g_mmpbsa/*.so
-    install_name_tool -change @rpath/libgromacs.2.dylib ${GMX_INSTALL}/lib/libgromacs.dylib build/lib.*/g_mmpbsa/*.so
+    install_name_tool -change @rpath/libgromacs.10.dylib ${GMX_INSTALL}/lib/libgromacs.dylib build/lib.*/g_mmpbsa/*.so
     GMX_INSTALL=${GMX_INSTALL} GMX_SRC=${GMX_SRC} APBS_INSTALL=${APBS_INSTALL} python -m pip wheel -v -w wheelhouse/ --no-deps --no-cache-dir .
     python -m pip uninstall -y g_mmpbsa
+    rm -rf build
 done
 pyenv global system
 
