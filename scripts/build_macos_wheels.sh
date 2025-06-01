@@ -36,7 +36,7 @@ PYTHONS=()
 for PYVER in ${PYVERS[@]}
 do
     # Install the latest release of the specified Python version using pyenv.
-    PYVER="$(pyenv install --list | grep -E "^\\s*$PYVER" | sort -n -t. -k3 | tail -n1)"
+    PYVER="$(pyenv install --list | grep -E "^\\s*$PYVER" | grep -v "[0-9]t$" | sort -n -t. -k3 | tail -n1)"
     pyenv install $PYVER
     pyenv global $PYVER
     PYTHONS+=($PYVER)
