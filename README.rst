@@ -36,7 +36,7 @@ It is now upgraded as Python package for easy installation and usage.
 g_mmpbsa contains several `sub-commands <https://g-mmpbsa.readthedocs.io/en/latest/commands/index.html>`_ to carry out binding energy calculation using MM/PBSA method and
 energetic contribution of each residue to the binding using energy decomposition scheme.
 
-Now g_mmpbsa can be directly installed on linux using ``python -m pip install g-mmpbsa`` and it supports all GROMACS version above 2018+.
+Now g_mmpbsa can be directly installed on **Linux** and **MacOS** using ``pip`` or ``pipx`` and it supports all the GROMACS versions.
 
 Please **post problems and queries** in |g_mmpbsa forum|, we will try our best to provide the solution.
 

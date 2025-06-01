@@ -1,8 +1,8 @@
 Download and Installation
 =========================
 
-Quick Installation using ``pip``
---------------------------------
+Quick Installation using ``pip`` or ``pipx``
+--------------------------------------------
 
 It is **recommended** method to install g_mmpbsa.
 
@@ -27,13 +27,30 @@ Distributions with **glibc version 2.28 or later** are supported. Some of the su
 * Fedora 29+
 * CentOS/RHEL 8+
 
-Use following steps to install g_mmpbsa:
+Using ``pip``
+++++++++++++++
+Use following steps to install g_mmpbsa using ``pip``:
 
 .. code:: bash
 
     sudo python3 -m pip install g-mmpbsa
 
-On macOS
+
+Using ``pipx``
+++++++++++++++
+In newer Linux distributions, it is not recommended to install Python packages 
+using ``pip`` directly.
+Instead, it is recommended to use `pipx <https://pipx.pypa.io/>`_ to install 
+Python packages in isolated environments.
+
+.. code:: bash
+
+    sudo python3 -m pip install --user pipx
+    python3 -m pipx ensurepath
+    source ~/.bashrc # or source ~/.zshrc
+    pipx install g-mmpbsa
+
+On MacOS
 ~~~~~~~~~~
 **No dependency on GROMACS. However, APBS should be installed externally.**
 
@@ -45,13 +62,28 @@ Following MacOS versions are supported:
 
 On MacOS, **external APBS is required** to run the ``g_mmpbsa``. If APBS is not installed, 
 the command will fail with an error message. Use **Homebrew to install APBS** on MacOS
-as follows:
+as follows.
+
+Using ``pip``
+++++++++++++++
 
 .. code:: bash
 
     brew install brewsci/bio/apbs # Install APBS using Homebrew
     sudo python3 -m pip install g-mmpbsa
 
+
+Using ``pipx``
+++++++++++++++
+
+Alternatively, `pipx <https://pipx.pypa.io/>`_ can be used to install g_mmpbsa in an
+isolated environment:
+
+.. code:: bash
+
+    brew install pipx             # Install pipx using Homebrew
+    brew install brewsci/bio/apbs # Install APBS using Homebrew
+    pipx install g-mmpbsa
 
 Installation from source code
 -----------------------------
