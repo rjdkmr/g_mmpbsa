@@ -31,7 +31,7 @@ cd ${CWD}
 mkdir wheelhouse
 eval "$(pyenv init -)"
 pyenv install --list
-PYVERS=("3.8" "3.9" "3.10" "3.11" "3.12" "3.13")
+PYVERS=("3.9" "3.10" "3.11" "3.12" "3.13")
 PYTHONS=()
 for PYVER in ${PYVERS[@]}
 do
