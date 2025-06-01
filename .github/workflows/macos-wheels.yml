@@ -51,11 +51,6 @@ jobs:
     needs: build_wheels
     name: Publish Python 🐍 distribution 📦 to PyPI
     runs-on: ${{ matrix.os }}
-    environment:
-      name: pypi
-      url: https://pypi.org/p/g-mmpbsa
-    permissions:
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -88,8 +83,12 @@ jobs:
           pip install setuptools wheel twine
 
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-
+        env:
+          TWINE_REPOSITORY: g-mmpbsa
+          TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: twine upload dist/*
 
   test_pypi_wheels:
     needs: publish

@@ -136,6 +136,7 @@ def populate_apbs_flags():
     apbs_flags['lib_dirs'] = []
     apbs_flags['ldflags'] = []
 
+    # APBS is not included in the g_mmpbsa on macOS, so we skip the rest of the code
     if sys.platform == 'darwin':
         return
     
