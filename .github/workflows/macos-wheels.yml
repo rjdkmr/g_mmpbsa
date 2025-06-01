@@ -109,5 +109,9 @@ jobs:
             platform_id: macosx_x86_64
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          
       - name: running tests
         run: bash scripts/test_macos_wheels.sh

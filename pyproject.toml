@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "g_mmpbsa"
-version = "3.0.6"
+version = "3.0.7"
 description = "MM/PBSA calculations for GROMACS."
 authors = [
     { name = "Rajendra Kumar", email = "rjdkmr@gmail.com" },
