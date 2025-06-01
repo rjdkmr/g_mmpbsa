@@ -6,6 +6,7 @@ on:
 
 jobs:
   build_wheels:
+    if: false
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -48,6 +49,7 @@ jobs:
           path: fixed_wheelhouse/*.whl
 
   publish:
+    if: false
     needs: build_wheels
     name: Publish Python 🐍 distribution 📦 to PyPI
     runs-on: ${{ matrix.os }}
@@ -91,7 +93,6 @@ jobs:
         run: twine upload dist/*
 
   test_pypi_wheels:
-    needs: publish
     name: Test PyPI wheels
     runs-on: ${{ matrix.os }}
     strategy:
@@ -99,19 +100,30 @@ jobs:
       matrix:
         include:
           - os: macos-13
-            python: 311
-            platform_id: macosx_x86_64     
-          - os: macos-14
-            python: 311
-            platform_id: macosx_x86_64
-          - os: macos-15
-            python: 311
-            platform_id: macosx_x86_64
+            python: '3.9'
+            platform_id: macos_13_x86_64_py39    
+          - os: macos-13
+            python: '3.10'
+            platform_id: macos_13_x86_64_py310
+          - os: macos-13
+            python: '3.11'
+            platform_id: macos_13_x86_64_py311
+          - os: macos-13
+            python: '3.12'
+            platform_id: macos_13_x86_64_py312    
+          - os: macos-13
+            python: '3.13'
+            platform_id: macos_13_x86_64_py313
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: "true"
           
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
       - name: running tests
         run: bash scripts/test_macos_wheels.sh
