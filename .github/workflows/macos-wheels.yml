@@ -2,11 +2,11 @@ name: MacOS-Wheels-Build
 
 on:
   push:
-    branches: [ "master" ]
+    tags:
+      - '**'
 
 jobs:
   build_wheels:
-    if: false
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -49,7 +49,6 @@ jobs:
           path: fixed_wheelhouse/*.whl
 
   publish:
-    if: false
     needs: build_wheels
     name: Publish Python 🐍 distribution 📦 to PyPI
     runs-on: ${{ matrix.os }}
@@ -93,6 +92,7 @@ jobs:
         run: twine upload dist/*
 
   test_pypi_wheels:
+    needs: publish
     name: Test PyPI wheels
     runs-on: ${{ matrix.os }}
     strategy:
