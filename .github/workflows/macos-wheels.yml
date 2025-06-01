@@ -98,10 +98,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [macos-13, macos-14, macos-15]
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
         include:
-          - os: [macos-13, macos-14, macos-15]
-            python: ['3.9', '3.10', '3.11', '3.12', '3.13']
-            platform_id: macosx_x86_64
+          - platform_id: macosx_x86_64
 
     steps:
       - uses: actions/checkout@v4
