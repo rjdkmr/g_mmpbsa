@@ -54,7 +54,6 @@ do
     python -m pip uninstall -y g_mmpbsa
     rm -rf build
 done
-pyenv global system
 
 # repair the wheels
 mkdir fixed_wheelhouse
@@ -62,14 +61,16 @@ delocate-listdeps wheelhouse/*.whl
 delocate-wheel -w fixed_wheelhouse -v wheelhouse/*.whl
 delocate-listdeps fixed_wheelhouse/*.whl
 
+
 # install from wheels and test the wheels
+cd test # change to test directory to avoid conflicts with installed g_mmpbsa module and g_mmpbsa directory
 for PYTHON in ${PYTHONS[@]}
 do
     pyenv global $PYTHON
     echo $(python --version)
-    python -m pip install -v --no-deps --no-cache-dir fixed_wheelhouse/*.whl
+    python -m pip install -v --no-deps --no-cache-dir ../fixed_wheelhouse/*.whl
     python -c "import g_mmpbsa; print('=====\nTEST -- g_mmpbsa GROMACS version: ', g_mmpbsa.gmx_version, '\n=====')"
 done
-pyenv global system
+cd ${CWD}
 
 ls -lrt fixed_wheelhouse/
