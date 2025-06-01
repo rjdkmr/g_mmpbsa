@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: fixed_wheels/*.whl
+          path: fixed_wheelhouse/*.whl
 
   publish:
     needs: build_wheels

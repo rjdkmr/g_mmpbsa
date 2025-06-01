@@ -36,7 +36,6 @@ from .g_mmpbsa import internal_apbs_exist
 
 def main():
     options = {'run': 'Run MM/PBSA calculation using trajectory and tpr file',
-               'apbs' : 'apbs program used in PB calculation. Only available if APBS is included with this package.',
                'energy2bfac': 'Generate PDB file where decomposed binding energy is written in B-factor column',
                'average': 'Calculate final average binding energy including all energy terms. Supports multiple complexes at once.',
                'correlation'   : 'Same as average, but also calculates correlation between predicted and experimental binding energies.',
@@ -44,8 +43,9 @@ def main():
               }
 
     program = sys.argv[0]
-    if internal_apbs_exist:
+    if internal_apbs_exist():
         os.environ['APBS'] = f'{program} apbs' # set-up APBS env which will be later used in mmpbsa
+        options['apbs'] = 'Run APBS calculation using APBS included with this package.'
  
     if len(sys.argv)<=1:
         show_help(options)
@@ -58,12 +58,12 @@ def main():
 
     if sys.argv[1] == 'run':
         from .g_mmpbsa import mmpbsa
-        if 'APBS' not in os.environ and not internal_apbs_exist:
+        if 'APBS' not in os.environ and not internal_apbs_exist():
             raise RuntimeError('APBS is not set in the environment. Please install and set APBS environment variable.')
         mmpbsa([program + ' run'] + sys.argv[2:])
         
     if sys.argv[1] == 'apbs':
-        if not internal_apbs_exist:
+        if not internal_apbs_exist():
             raise RuntimeError('APBS is not included with this package.')
         from .g_mmpbsa import apbs
         apbs(['apbs'] + sys.argv[2:])

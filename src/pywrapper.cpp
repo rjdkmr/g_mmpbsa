@@ -32,83 +32,90 @@
  *
  */
 
- #include <pybind11/pybind11.h>
- #include <pybind11/stl.h>
- 
- #include <string>
- #include <vector>
- #include <cstdlib>
- #include <cstdio>
- #include <unistd.h>
- #include <signal.h>
- 
- 
- #include "gromacs/commandline/cmdlineinit.h"
- #include "gromacs/utility/baseversion.h"
- 
- namespace py = pybind11;
- 
- #ifdef APBS_INTERNAL
- int apbs(int argc,char *argv[]);
- #endif
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
- int mmpbsa(int argc,char *argv[]);
- int energy2bfac (int argc,char *argv[]);
- 
- void exit_handler(int s){
-     printf(" Caught KeyboardInterrupt in C++\n");
-     exit(1);
- }
- 
- void register_ctrl_c_signal() {
-     struct sigaction sigIntHandler;
-     sigIntHandler.sa_handler = exit_handler;
-     sigemptyset(&sigIntHandler.sa_mask);
-     sigIntHandler.sa_flags = 0;
-     sigaction(SIGINT, &sigIntHandler, NULL);
- }
- 
- template<typename F>
- void wrapped_gmx_function(std::vector<std::string> argument_vector, F *func) {
-     /* Acquire GIL before calling Python code */
-     py::gil_scoped_acquire acquire;
- 
-     char *argv[argument_vector.size()];
-     for(size_t n =0; n<argument_vector.size(); n++)
-         argv[n] = &argument_vector.at(n)[0];
-     
-     func(argument_vector.size(), argv);
- }
- 
- void wrap_gmx_programs(py::module &m) {
-     register_ctrl_c_signal(); // register Ctrl+C for keyboard interruption
-     
-    #ifdef APBS_INTERNAL
-     std::function<void(std::vector<std::string>)> wrapped_apbs = [](std::vector<std::string>  argument_vector) { 
-         wrapped_gmx_function(argument_vector, &apbs);
-     };
-     m.def("apbs", wrapped_apbs, py::call_guard<py::gil_scoped_release>());
-     m.attr("internal_apbs_exist") = py::bool_(true); // APBS is included in this build
-    #else
-     m.attr("internal_apbs_exist") = py::bool_(false); // APBS is not included in this build
-    #endif
-     
-     std::function<void(std::vector<std::string>)> wrapped_mmpbsa = [](std::vector<std::string>  argument_vector) { 
-         wrapped_gmx_function(argument_vector, &mmpbsa);
-     };
-     
-     std::function<void(std::vector<std::string>)> wrapped_energy2bfac = [](std::vector<std::string>  argument_vector) { 
-         wrapped_gmx_function(argument_vector, &energy2bfac);
-     };
-     
-     m.def("gmx_version", &gmx_version);
-     m.def("mmpbsa", wrapped_mmpbsa, py::call_guard<py::gil_scoped_release>());
-     m.def("energy2bfac", wrapped_energy2bfac, py::call_guard<py::gil_scoped_release>());
- }
- 
- 
- PYBIND11_MODULE(g_mmpbsa, m) 
- {
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
+#include <signal.h>
+
+#include "gromacs/commandline/cmdlineinit.h"
+#include "gromacs/utility/baseversion.h"
+
+namespace py = pybind11;
+
+#ifdef APBS_INTERNAL
+int apbs(int argc, char *argv[]);
+#endif
+
+int mmpbsa(int argc, char *argv[]);
+int energy2bfac(int argc, char *argv[]);
+
+void exit_handler(int s)
+{
+    printf(" Caught KeyboardInterrupt in C++\n");
+    exit(1);
+}
+
+void register_ctrl_c_signal()
+{
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = exit_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+}
+
+template <typename F>
+void wrapped_gmx_function(std::vector<std::string> argument_vector, F *func)
+{
+    char *argv[argument_vector.size()];
+    for (size_t n = 0; n < argument_vector.size(); n++)
+        argv[n] = &argument_vector.at(n)[0];
+
+    func(argument_vector.size(), argv);
+
+    /* Acquire GIL before calling Python code */
+    py::gil_scoped_acquire acquire;
+}
+
+void wrap_gmx_programs(py::module &m)
+{
+    register_ctrl_c_signal(); // register Ctrl+C for keyboard interruption
+
+#ifdef APBS_INTERNAL
+    std::function<bool()> internal_apbs_exist = []()
+    { return true; }; // APBS is included in this build
+    std::function<void(std::vector<std::string>)> wrapped_apbs = [](std::vector<std::string> argument_vector)
+    {
+        wrapped_gmx_function(argument_vector, &apbs);
+    };
+    m.def("apbs", wrapped_apbs, py::call_guard<py::gil_scoped_release>());
+#else
+    std::function<bool()> internal_apbs_exist = []()
+    { return false; }; // APBS is not included in this build
+#endif
+
+    std::function<void(std::vector<std::string>)> wrapped_mmpbsa = [](std::vector<std::string> argument_vector)
+    {
+        wrapped_gmx_function(argument_vector, &mmpbsa);
+    };
+
+    std::function<void(std::vector<std::string>)> wrapped_energy2bfac = [](std::vector<std::string> argument_vector)
+    {
+        wrapped_gmx_function(argument_vector, &energy2bfac);
+    };
+
+    m.def("gmx_version", &gmx_version);
+    m.def("mmpbsa", wrapped_mmpbsa, py::call_guard<py::gil_scoped_release>());
+    m.def("energy2bfac", wrapped_energy2bfac, py::call_guard<py::gil_scoped_release>());
+    m.def("internal_apbs_exist", internal_apbs_exist, "Check if APBS is included in this build of g_mmpbsa");
+}
+
+PYBIND11_MODULE(g_mmpbsa, m)
+{
     wrap_gmx_programs(m);
- }
- 
+}
