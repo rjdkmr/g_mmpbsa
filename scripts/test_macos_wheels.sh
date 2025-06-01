@@ -3,11 +3,10 @@ set -e -x
 
 CWD=`pwd`
 
-brew install gettext pyenv
 brew install brewsci/bio/apbs
 brew cleanup
 export APBS=$(brew --prefix apbs)/bin/apbs
-$APBS --version
+
 cd test
 
 python3 -m pip install g-mmpbsa
