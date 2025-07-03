@@ -1020,7 +1020,7 @@ void AnalysisMMPBSA::writeOutput()
         totalResiduesEnergy_.resize(atoms_->nres, 0.0);
 
 
-        fprintf(fResiduesEnergySummary_, "Resdiue,vDW,vdW-stddev,Electrostatic,Electrostatic-stdev,polar,polar-stdev,apolar,apolar-stdev,total,total-stdev,\n");
+        fprintf(fResiduesEnergySummary_, "Residue,vDW,vdW-stddev,Electrostatic,Electrostatic-stddev,polar,polar-stddev,apolar,apolar-stddev,total,total-stddev,\n");
 
         for (int r = 0; r < atoms_->nres; r++)  { // over residues
             if ( ( bResA_[r] ) || ( bResB_[r] ) ) {
