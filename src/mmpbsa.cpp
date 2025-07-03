@@ -1002,12 +1002,12 @@ void AnalysisMMPBSA::writeOutput()
     // Write summary of average binding energy and its components
     if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_) && (!fnEnergySummary_.empty())) {
         FILE *fEnergySummary_ = gmx_ffopen(fnEnergySummary_, "w");
-        fprintf(fEnergySummary_, "\"Energy\", \"Average\", \"Standard-Deviation\",\n");
-        fprintf(fEnergySummary_, "\"vDW\",                 %.3f, %.3f,\n", avBindingEnergyData_->average(0, 0), avBindingEnergyData_->standardDeviation(0, 0));
-        fprintf(fEnergySummary_, "\"Electrostatic\",       %.3f, %.3f,\n", avBindingEnergyData_->average(0, 1), avBindingEnergyData_->standardDeviation(0, 1));
-        fprintf(fEnergySummary_, "\"Polar-solvation\",     %.3f, %.3f,\n", avBindingEnergyData_->average(0, 2), avBindingEnergyData_->standardDeviation(0, 2));
-        fprintf(fEnergySummary_, "\"Non-polar-solvation\", %.3f, %.3f,\n", avBindingEnergyData_->average(0, 3), avBindingEnergyData_->standardDeviation(0, 3));
-        fprintf(fEnergySummary_, "\"Total\",               %.3f, %.3f,\n", avBindingEnergyData_->average(0, 4), avBindingEnergyData_->standardDeviation(0, 4));
+        fprintf(fEnergySummary_, "Energy,Average,Standard-Deviation,\n");
+        fprintf(fEnergySummary_, "vDW,%.3f,%.3f,\n", avBindingEnergyData_->average(0, 0), avBindingEnergyData_->standardDeviation(0, 0));
+        fprintf(fEnergySummary_, "Electrostatic,%.3f,%.3f,\n", avBindingEnergyData_->average(0, 1), avBindingEnergyData_->standardDeviation(0, 1));
+        fprintf(fEnergySummary_, "Polar-solvation,%.3f,%.3f,\n", avBindingEnergyData_->average(0, 2), avBindingEnergyData_->standardDeviation(0, 2));
+        fprintf(fEnergySummary_, "Non-polar-solvation,%.3f,%.3f,\n", avBindingEnergyData_->average(0, 3), avBindingEnergyData_->standardDeviation(0, 3));
+        fprintf(fEnergySummary_, "Total,%.3f, %.3f,\n", avBindingEnergyData_->average(0, 4), avBindingEnergyData_->standardDeviation(0, 4));
         gmx_ffclose(fEnergySummary_);
     }
 
@@ -1020,13 +1020,11 @@ void AnalysisMMPBSA::writeOutput()
         totalResiduesEnergy_.resize(atoms_->nres, 0.0);
 
 
-        fprintf(fResiduesEnergySummary_, "\"Resdiue\", \"vDW\", \"vdW-stddev\", \"Elec.\", \"Elec.-stdev\","
-                                         "\"polar\", \"polar-stdev\", \"apolar\", \"apolar-stdev\","
-                                         "\"total\", \"total-stdev\",\n");
+        fprintf(fResiduesEnergySummary_, "Resdiue,vDW,vdW-stddev,Electrostatic,Electrostatic-stdev,polar,polar-stdev,apolar,apolar-stdev,total,total-stdev,\n");
 
         for (int r = 0; r < atoms_->nres; r++)  { // over residues
             if ( ( bResA_[r] ) || ( bResB_[r] ) ) {
-                fprintf(fResiduesEnergySummary_, "\"%s-%d\", ", * ( atoms_->resinfo[r].name ), atoms_->resinfo[r].nr);
+                fprintf(fResiduesEnergySummary_, "%s-%d,", * ( atoms_->resinfo[r].name ), atoms_->resinfo[r].nr);
 
                 // For four energy terms, write average and standard deviations
                 for (size_t n = 0 ; n < residuesEnergy.size(); n++)    { // over energy terms
@@ -1034,7 +1032,7 @@ void AnalysisMMPBSA::writeOutput()
                         energy[frame] = residuesEnergy[n][frame][r];
                     }
                     calc_average_stdev(energy, &av, &stdev);
-                    fprintf(fResiduesEnergySummary_, "%.3f, %.3f, ",av, stdev);
+                    fprintf(fResiduesEnergySummary_, "%.3f,%.3f,",av, stdev);
                 }
 
                 // total energy from each frame
@@ -1046,7 +1044,7 @@ void AnalysisMMPBSA::writeOutput()
                 calc_average_stdev(energy, &av, &stdev);
 
                 // write total energy and standard deviation
-                fprintf(fResiduesEnergySummary_, "%.3f, %.3f,\n",av, stdev);
+                fprintf(fResiduesEnergySummary_, "%.3f,%.3f,\n",av, stdev);
 
                 // save total energy for subsequent use
                 totalResiduesEnergy_[r] = av;
