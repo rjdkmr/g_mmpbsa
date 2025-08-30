@@ -84,7 +84,7 @@ class Complex(object):
     def CalcEnergy(self,args,frame_wise,idx):
         mmEn = ReadData(self.MmFile,n=7)
         polEn = ReadData(self.PolFile,n=4)
-        apolEn = ReadData(self.APolFile,n=10)
+        apolEn = ReadData(self.APolFile,n=7)
         CheckEnData(mmEn,polEn,apolEn)
 
         time, MM, Vdw, Elec, Pol, Apol, Sas, Sav = [], [], [], [], [], [], [], []
