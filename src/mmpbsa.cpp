@@ -691,6 +691,8 @@ AnalysisMMPBSA::initAnalysis ( const TrajectoryAnalysisSettings &settings,
     } else {
         snew ( isize_, 1 );
         snew ( index_, 1 );
+        isize_[0] = selA_.atomCount();
+        index_[0] = selA_.atomIndices().data();
     }
 
     // building bResA_ and bResB_ array here
