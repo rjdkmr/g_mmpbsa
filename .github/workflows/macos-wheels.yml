@@ -77,7 +77,10 @@ jobs:
           pip install setuptools wheel twine
 
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*
 
   test_pypi_wheels:
     needs: publish
